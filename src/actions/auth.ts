@@ -26,7 +26,7 @@ const SESSION_COOKIE_NAME = "session"
  */
 export async function login(email: string, password: string): Promise<LoginResult> {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -67,7 +67,7 @@ export async function login(email: string, password: string): Promise<LoginResul
  */
 export async function logout(): Promise<void> {
     try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/logout`, {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
             method: "POST",
             credentials: "include",
         }).catch(() => {

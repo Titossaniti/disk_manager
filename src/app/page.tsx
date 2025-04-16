@@ -1,11 +1,12 @@
-import { Button } from "@/components/ui/button";
+import { getSession } from "@/actions/auth"
+import { redirect } from "next/navigation"
 
-export default function Home() {
-  return (
-      <div className="flex items-center justify-center h-screen">
-        <Button>
-            Test Shadcn Button
-        </Button>
-      </div>
-  );
+export default async function Home() {
+    const session = await getSession()
+
+    if (session) {
+        redirect("/dashboard")
+    } else {
+        redirect("/login")
+    }
 }

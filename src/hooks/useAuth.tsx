@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 type User = {
     id: string
@@ -23,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     const router = useRouter()
+    const pathname = usePathname()
 
     useEffect(() => {
         async function fetchUser() {
@@ -44,8 +45,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         }
 
-        fetchUser()
-    }, [])
+        // fetch user que si on est dans une page protégée
+        if (pathname.startsWith("/dashboard")) {
+            fetchUser()
+        } else {
+            setIsLoading(false) // sinon sort "proprement" du loading
+        }
+    }, [pathname])
 
     const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
         setIsLoading(true)
