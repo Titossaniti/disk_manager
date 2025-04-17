@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +11,6 @@ import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/useAuth"
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
-    const router = useRouter()
     const { login, isLoading } = useAuth()
     const [error, setError] = useState("")
 
@@ -26,11 +24,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
         try {
             const result = await login(email, password)
-            if (result.success) {
-                router.push("/dashboard")
-            } else {
+
+            if (!result.success) {
                 setError(result.error || "Invalid email or password")
             }
+
         } catch (error) {
             setError("An unexpected error occurred. Please try again later.")
         }

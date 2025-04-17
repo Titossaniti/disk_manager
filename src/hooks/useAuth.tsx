@@ -1,12 +1,13 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react"
-import { useRouter, usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 type User = {
     id: string
     email: string
     name: string
+    role: string
 }
 
 type AuthContextType = {
@@ -26,10 +27,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const pathname = usePathname()
 
     useEffect(() => {
+        console.log("[AuthProvider] pathname =", pathname)
         async function fetchUser() {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
                     credentials: "include",
+                    cache: "no-store",
                 })
                 if (res.ok) {
                     const data = await res.json()
@@ -45,23 +48,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         }
 
-        // fetch user que si on est dans une page protégée
+        // Appelle /me uniquement sur les pages privées
         if (pathname.startsWith("/dashboard")) {
-            fetchUser()
+            console.log("Appel de /me")
+            fetchUser().then(r => {
+                console.log("[useAuth] fetchUser", r)
+            })
         } else {
-            setIsLoading(false) // sinon sort "proprement" du loading
+            setIsLoading(false)
         }
     }, [pathname])
 
-    const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    const login = async (email: string, password: string) => {
         setIsLoading(true)
         try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
                 method: "POST",
                 credentials: "include",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ email, password }),
             })
 
@@ -74,13 +78,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
 
             const data = await response.json()
-            setUser(data.user ?? { id: "1", email, name: email.split("@")[0] })
+            setUser(data.user ?? { id: "1", email, name: email.split("@")[0], role: "USER" })
+
+            router.push("/dashboard")
             return { success: true }
         } catch (error) {
             console.error("Login error:", error)
             return {
                 success: false,
-                error: "Failed to connect to authentication service",
+                error: "Erreur réseau. Merci de réessayer.",
             }
         } finally {
             setIsLoading(false)
@@ -104,15 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider
-            value={{
-                user,
-                isLoading,
-                isAuthenticated: !!user,
-                login,
-                logout,
-            }}
-        >
+        <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, logout }}>
             {children}
         </AuthContext.Provider>
     )

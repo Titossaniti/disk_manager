@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { LayoutDashboard, Settings, Users, FileText, LogOut, Building2 } from "lucide-react"
+import { LayoutDashboard, LogOut, Building2 } from "lucide-react"
 
 import {
     Sidebar,
@@ -18,8 +18,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/hooks/useAuth"
 
 export function AppSidebar() {
-    const { user, logout } = useAuth()
+    const { user, isLoading, logout } = useAuth()
 
+    if (isLoading) return null
     if (!user) return null
 
     const navItems = [
@@ -64,7 +65,7 @@ export function AppSidebar() {
                     <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8">
                             <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} alt={user.name} />
-                            <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                            <AvatarFallback>{user?.name?.charAt(0)?.toUpperCase() ?? "?"}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
                             <span className="text-sm font-medium">{user.name}</span>

@@ -5,11 +5,15 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { getSession } from "@/actions/auth"
 import { redirect } from "next/navigation"
 
+export const dynamic = "force-dynamic"
+
 export default async function PrivateLayout({ children }: { children: ReactNode }) {
     const session = await getSession()
 
     if (!session) {
-        redirect("/login")
+        console.log("[PrivateLayout] Pas de session, redirection vers /login")
+        console.log("[PrivateLayout] session =", session)
+        // redirect("/login")
     }
 
     return (
