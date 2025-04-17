@@ -27,7 +27,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const pathname = usePathname()
 
     useEffect(() => {
-        console.log("[AuthProvider] pathname =", pathname)
         async function fetchUser() {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
@@ -50,10 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Appelle /me uniquement sur les pages privées
         if (pathname.startsWith("/dashboard")) {
-            console.log("Appel de /me")
-            fetchUser().then(r => {
-                console.log("[useAuth] fetchUser", r)
-            })
+            fetchUser()
         } else {
             setIsLoading(false)
         }

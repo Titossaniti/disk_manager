@@ -1,7 +1,7 @@
 "use server"
 
-import { cookies } from "next/headers"
-import { redirect } from "next/navigation"
+import {cookies} from "next/headers"
+import {redirect} from "next/navigation"
 
 type SessionUser = {
     id: string
@@ -17,20 +17,24 @@ export async function getSession(): Promise<SessionUser | null> {
     const cookieStore = await cookies()
     const jwt = cookieStore.get('jwt')?.value
 
+    // Si pas de cookie, pas de session
     if (!jwt) return null
 
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+            method: "GET",
             headers: {
-                Authorization: `Bearer ${jwt}`,
+                Cookie: `jwt=${jwt}`,
             },
-            cache: 'no-store',
+            credentials: "include",
+            cache: "no-store",
         })
 
         if (!res.ok) return null
 
         return await res.json()
-    } catch {
+    } catch (err) {
+        console.error("[getSession] erreur :", err)
         return null
     }
 }

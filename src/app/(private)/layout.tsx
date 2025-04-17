@@ -11,9 +11,7 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
     const session = await getSession()
 
     if (!session) {
-        console.log("[PrivateLayout] Pas de session, redirection vers /login")
-        console.log("[PrivateLayout] session =", session)
-        // redirect("/login")
+        redirect("/login")
     }
 
     return (
