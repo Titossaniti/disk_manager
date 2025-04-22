@@ -1,54 +1,75 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
 import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import {
+    ChartContainer,
+    ChartLegend,
+    ChartLegendContent,
+    ChartTooltip,
+    ChartTooltipContent,
+    type ChartConfig,
+} from "@/components/ui/chart"
+import {
     Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
-type RawStat = {
+type MonthlyStat = {
     year: number
     month: number
     revenue: number
     margin: number
     sold: number
+    label: string
 }
 
-type StatKey = "sold" | "revenue" | "margin"
+const chartConfig = {
+    revenue: {
+        label: "Chiffre d'affaires",
+        color: "hsl(160 48% 49%)",
+    },
+    margin: {
+        label: "Marge",
+        color: "hsl(220 70% 49.6%)",
+    },
+    sold: {
+        label: "Ventes",
+        color: "hsl(220 70% 49.6%)",
+    },
+} satisfies ChartConfig
 
-const LABELS: Record<StatKey, string> = {
-    sold: "Ventes",
-    revenue: "Chiffre d'affaires",
-    margin: "Marge",
-}
+type ViewMode = "stacked" | "sold"
 
-export default function MonthlyStatisticsChart() {
-    const [allStats, setAllStats] = useState<RawStat[]>([])
-    const [displayedStats, setDisplayedStats] = useState<RawStat[]>([])
-    const [selectedKey, setSelectedKey] = useState<StatKey>("sold")
+export default function StatisticsChart() {
+    const [allStats, setAllStats] = useState<MonthlyStat[]>([])
+    const [displayedStats, setDisplayedStats] = useState<MonthlyStat[]>([])
     const [loading, setLoading] = useState(true)
+    const [viewMode, setViewMode] = useState<ViewMode>("sold")
 
-    // selected dates
-    const currentDate = new Date()
-    const [fromMonth, setFromMonth] = useState<number>(currentDate.getMonth())
-    const [fromYear, setFromYear] = useState<number>(currentDate.getFullYear() - 1)
-    const [toMonth, setToMonth] = useState<number>(currentDate.getMonth())
-    const [toYear, setToYear] = useState<number>(currentDate.getFullYear())
+    const now = new Date()
+    const [fromMonth, setFromMonth] = useState<number>(now.getMonth())
+    const [fromYear, setFromYear] = useState<number>(now.getFullYear() - 1)
+    const [toMonth, setToMonth] = useState<number>(now.getMonth())
+    const [toYear, setToYear] = useState<number>(now.getFullYear())
 
     const monthOptions = [...Array(12).keys()].map((m) => ({
         value: m,
         label: format(new Date(2024, m, 1), "MMMM", { locale: fr }),
     }))
-
-    const yearOptions = Array.from({ length: currentDate.getFullYear() - 2000 + 1 }, (_, i) => 2000 + i)
+    const yearOptions = Array.from({ length: now.getFullYear() - 2000 + 1 }, (_, i) => 2000 + i)
 
     useEffect(() => {
-        async function fetchAllStats() {
+        async function fetchStats() {
             setLoading(true)
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/stats/by-month`, {
@@ -56,61 +77,66 @@ export default function MonthlyStatisticsChart() {
                     cache: "no-store",
                 })
                 const json = await res.json()
-                setAllStats(json)
+                const withLabels = json.map((item: MonthlyStat) => ({
+                    ...item,
+                    label: format(new Date(item.year, item.month - 1, 1), "MMM yy", { locale: fr }),
+                }))
+                setAllStats(withLabels)
             } catch (err) {
-                console.error("Erreur fetch stats globales :", err)
+                console.error("Erreur fetch:", err)
             } finally {
                 setLoading(false)
             }
         }
 
-        fetchAllStats()
+        fetchStats()
     }, [])
 
     useEffect(() => {
         if (!allStats.length) return
+        const from = new Date(fromYear, fromMonth)
+        const to = new Date(toYear, toMonth)
 
-        const from = new Date(fromYear, fromMonth, 1)
-        const to = new Date(toYear, toMonth, 1)
+        if (from > to) {
+            setDisplayedStats([])
+            return
+        }
 
         const filtered = allStats.filter((s) => {
-            const date = new Date(s.year, s.month - 1, 1)
+            const date = new Date(s.year, s.month - 1)
             return date >= from && date <= to
         })
 
-        setDisplayedStats(
-            filtered.map((s) => ({
-                ...s,
-                label: format(new Date(s.year, s.month - 1, 1), "MMM yy", { locale: fr }),
-            }))
-        )
+        setDisplayedStats(filtered)
     }, [fromMonth, fromYear, toMonth, toYear, allStats])
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Statistiques mensuelles</CardTitle>
-                <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
-                    {/* Choix de la donnée */}
+                <div className="flex flex-wrap justify-between mt-4 gap-2">
+                    {/* Boutons : Vues */}
                     <div className="flex flex-wrap gap-2">
-                        {Object.keys(LABELS).map((key) => (
-                            <Button
-                                key={key}
-                                variant={key === selectedKey ? "default" : "outline"}
-                                onClick={() => setSelectedKey(key as StatKey)}
-                                size="sm"
-                            >
-                                {LABELS[key as StatKey]}
-                            </Button>
-                        ))}
+                        <Button
+                            variant={viewMode === "sold" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setViewMode("sold")}
+                        >
+                            Ventes
+                        </Button>
+                        <Button
+                            variant={viewMode === "stacked" ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setViewMode("stacked")}
+                        >
+                            Chiffre d'affaires & Marge
+                        </Button>
                     </div>
 
-                    {/* Choix des dates */}
+                    {/* Sélecteurs de période */}
                     <div className="flex gap-2 flex-wrap">
                         <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
-                            <SelectTrigger className="w-[120px]">
-                                <SelectValue placeholder="Mois début" />
-                            </SelectTrigger>
+                            <SelectTrigger className="w-[120px]"><SelectValue placeholder="Mois début" /></SelectTrigger>
                             <SelectContent>
                                 {monthOptions.map((m) => (
                                     <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
@@ -119,9 +145,7 @@ export default function MonthlyStatisticsChart() {
                         </Select>
 
                         <Select value={String(fromYear)} onValueChange={(v) => setFromYear(Number(v))}>
-                            <SelectTrigger className="w-[100px]">
-                                <SelectValue placeholder="Année début" />
-                            </SelectTrigger>
+                            <SelectTrigger className="w-[100px]"><SelectValue placeholder="Année début" /></SelectTrigger>
                             <SelectContent>
                                 {yearOptions.map((y) => (
                                     <SelectItem key={y} value={String(y)}>{y}</SelectItem>
@@ -130,9 +154,7 @@ export default function MonthlyStatisticsChart() {
                         </Select>
 
                         <Select value={String(toMonth)} onValueChange={(v) => setToMonth(Number(v))}>
-                            <SelectTrigger className="w-[120px]">
-                                <SelectValue placeholder="Mois fin" />
-                            </SelectTrigger>
+                            <SelectTrigger className="w-[120px]"><SelectValue placeholder="Mois fin" /></SelectTrigger>
                             <SelectContent>
                                 {monthOptions.map((m) => (
                                     <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
@@ -141,9 +163,7 @@ export default function MonthlyStatisticsChart() {
                         </Select>
 
                         <Select value={String(toYear)} onValueChange={(v) => setToYear(Number(v))}>
-                            <SelectTrigger className="w-[100px]">
-                                <SelectValue placeholder="Année fin" />
-                            </SelectTrigger>
+                            <SelectTrigger className="w-[100px]"><SelectValue placeholder="Année fin" /></SelectTrigger>
                             <SelectContent>
                                 {yearOptions.map((y) => (
                                     <SelectItem key={y} value={String(y)}>{y}</SelectItem>
@@ -154,18 +174,29 @@ export default function MonthlyStatisticsChart() {
                 </div>
             </CardHeader>
 
-            <CardContent>
+            <CardContent >
                 {loading ? (
-                    <Skeleton className="w-full h-64" />
+                    <Skeleton className="w-full h-[300px]" />
+                ) : displayedStats.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Aucune donnée pour cette période.</p>
                 ) : (
-                    <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={displayedStats}>
-                            <XAxis dataKey="label" />
-                            <YAxis />
-                            <Tooltip/>
-                            <Bar dataKey={selectedKey} fill="#4f46e5" />
+                    <ChartContainer config={chartConfig} className="h-[500px] w-full">
+                        <BarChart data={displayedStats} >
+                            <CartesianGrid vertical={false} />
+                            <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} />
+                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <ChartLegend content={<ChartLegendContent />} />
+
+                            {viewMode === "sold" ? (
+                                <Bar dataKey="sold" fill="var(--color-sold)" radius={[4, 4, 0, 0]} />
+                            ) : (
+                                <>
+                                    <Bar dataKey="margin" stackId="a" fill="var(--color-margin)" radius={[0, 0, 0, 0]} />
+                                    <Bar dataKey="revenue" stackId="a" fill="var(--color-revenue)" radius={[4, 4, 0, 0]} />
+                                </>
+                            )}
                         </BarChart>
-                    </ResponsiveContainer>
+                    </ChartContainer>
                 )}
             </CardContent>
         </Card>
