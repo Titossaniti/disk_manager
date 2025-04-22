@@ -5,142 +5,164 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { addMonths, format, isBefore } from "date-fns"
+import { format } from "date-fns"
 import { fr } from "date-fns/locale"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import {
+    Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select"
 
-type StatKey = "countSoldThisPeriod" | "revenueThisPeriod" | "marginThisPeriod"
-
-type MonthlyStat = {
-    label: string
-    countSoldThisPeriod: number
-    revenueThisPeriod: number
-    marginThisPeriod: number
+type RawStat = {
+    year: number
+    month: number
+    revenue: number
+    margin: number
+    sold: number
 }
 
-const STAT_LABELS: Record<StatKey, string> = {
-    countSoldThisPeriod: "Ventes",
-    revenueThisPeriod: "Chiffre d'affaires",
-    marginThisPeriod: "Marge",
+type StatKey = "sold" | "revenue" | "margin"
+
+const LABELS: Record<StatKey, string> = {
+    sold: "Ventes",
+    revenue: "Chiffre d'affaires",
+    margin: "Marge",
 }
 
-export default function StatisticsChart() {
-    const [data, setData] = useState<MonthlyStat[]>([])
+export default function MonthlyStatisticsChart() {
+    const [allStats, setAllStats] = useState<RawStat[]>([])
+    const [displayedStats, setDisplayedStats] = useState<RawStat[]>([])
+    const [selectedKey, setSelectedKey] = useState<StatKey>("sold")
     const [loading, setLoading] = useState(true)
-    const [selectedKey, setSelectedKey] = useState<StatKey>("countSoldThisPeriod")
 
-    const [fromDate, setFromDate] = useState<Date>(() => addMonths(new Date(), -23))
-    const [toDate, setToDate] = useState<Date>(() => new Date())
+    // selected dates
+    const currentDate = new Date()
+    const [fromMonth, setFromMonth] = useState<number>(currentDate.getMonth())
+    const [fromYear, setFromYear] = useState<number>(currentDate.getFullYear() - 1)
+    const [toMonth, setToMonth] = useState<number>(currentDate.getMonth())
+    const [toYear, setToYear] = useState<number>(currentDate.getFullYear())
+
+    const monthOptions = [...Array(12).keys()].map((m) => ({
+        value: m,
+        label: format(new Date(2024, m, 1), "MMMM", { locale: fr }),
+    }))
+
+    const yearOptions = Array.from({ length: currentDate.getFullYear() - 2000 + 1 }, (_, i) => 2000 + i)
 
     useEffect(() => {
-        async function fetchStats() {
+        async function fetchAllStats() {
             setLoading(true)
-            const months = []
-
-            const cursor = new Date(fromDate)
-            while (cursor <= toDate) {
-                const fromStr = new Date(cursor.getFullYear(), cursor.getMonth(), 1).toISOString().split("T")[0]
-                const toStr = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 0).toISOString().split("T")[0]
-                const label = format(cursor, "MMM yy", { locale: fr })
-
-                months.push({ fromStr, toStr, label })
-                cursor.setMonth(cursor.getMonth() + 1)
+            try {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/stats/by-month`, {
+                    credentials: "include",
+                    cache: "no-store",
+                })
+                const json = await res.json()
+                setAllStats(json)
+            } catch (err) {
+                console.error("Erreur fetch stats globales :", err)
+            } finally {
+                setLoading(false)
             }
-
-            const results: MonthlyStat[] = []
-
-            for (const m of months) {
-                try {
-                    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/stats?from=${m.fromStr}&to=${m.toStr}`, {
-                        credentials: "include",
-                        cache: "no-store",
-                    })
-                    const json = await res.json()
-                    results.push({
-                        label: m.label,
-                        countSoldThisPeriod: json.countSoldThisPeriod ?? 0,
-                        revenueThisPeriod: json.revenueThisPeriod ?? 0,
-                        marginThisPeriod: json.marginThisPeriod ?? 0,
-                    })
-                } catch {
-                    results.push({
-                        label: m.label,
-                        countSoldThisPeriod: 0,
-                        revenueThisPeriod: 0,
-                        marginThisPeriod: 0,
-                    })
-                }
-            }
-
-            setData(results)
-            setLoading(false)
         }
 
-        fetchStats()
-    }, [fromDate, toDate])
+        fetchAllStats()
+    }, [])
+
+    useEffect(() => {
+        if (!allStats.length) return
+
+        const from = new Date(fromYear, fromMonth, 1)
+        const to = new Date(toYear, toMonth, 1)
+
+        const filtered = allStats.filter((s) => {
+            const date = new Date(s.year, s.month - 1, 1)
+            return date >= from && date <= to
+        })
+
+        setDisplayedStats(
+            filtered.map((s) => ({
+                ...s,
+                label: format(new Date(s.year, s.month - 1, 1), "MMM yy", { locale: fr }),
+            }))
+        )
+    }, [fromMonth, fromYear, toMonth, toYear, allStats])
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Statistiques mensuelles</CardTitle>
-                <div className="flex flex-wrap gap-2 mt-4">
-                    {Object.keys(STAT_LABELS).map((key) => (
-                        <Button
-                            key={key}
-                            variant={key === selectedKey ? "default" : "outline"}
-                            onClick={() => setSelectedKey(key as StatKey)}
-                            size="sm"
-                        >
-                            {STAT_LABELS[key as StatKey]}
-                        </Button>
-                    ))}
-                </div>
-                <div className="flex gap-4 mt-4 flex-wrap">
-                    {/* Sélection date de début */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline">
-                                Début : {format(fromDate, "dd MMM yyyy", { locale: fr })}
+                <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
+                    {/* Choix de la donnée */}
+                    <div className="flex flex-wrap gap-2">
+                        {Object.keys(LABELS).map((key) => (
+                            <Button
+                                key={key}
+                                variant={key === selectedKey ? "default" : "outline"}
+                                onClick={() => setSelectedKey(key as StatKey)}
+                                size="sm"
+                            >
+                                {LABELS[key as StatKey]}
                             </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={fromDate}
-                                onSelect={(date) => date && isBefore(date, toDate) && setFromDate(date)}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
+                        ))}
+                    </div>
 
-                    {/* Sélection date de fin */}
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline">
-                                Fin : {format(toDate, "dd MMM yyyy", { locale: fr })}
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0">
-                            <Calendar
-                                mode="single"
-                                selected={toDate}
-                                onSelect={(date) => date && isBefore(fromDate, date) && setToDate(date)}
-                                initialFocus
-                            />
-                        </PopoverContent>
-                    </Popover>
+                    {/* Choix des dates */}
+                    <div className="flex gap-2 flex-wrap">
+                        <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
+                            <SelectTrigger className="w-[120px]">
+                                <SelectValue placeholder="Mois début" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {monthOptions.map((m) => (
+                                    <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        <Select value={String(fromYear)} onValueChange={(v) => setFromYear(Number(v))}>
+                            <SelectTrigger className="w-[100px]">
+                                <SelectValue placeholder="Année début" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {yearOptions.map((y) => (
+                                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        <Select value={String(toMonth)} onValueChange={(v) => setToMonth(Number(v))}>
+                            <SelectTrigger className="w-[120px]">
+                                <SelectValue placeholder="Mois fin" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {monthOptions.map((m) => (
+                                    <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+
+                        <Select value={String(toYear)} onValueChange={(v) => setToYear(Number(v))}>
+                            <SelectTrigger className="w-[100px]">
+                                <SelectValue placeholder="Année fin" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {yearOptions.map((y) => (
+                                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </div>
             </CardHeader>
+
             <CardContent>
                 {loading ? (
                     <Skeleton className="w-full h-64" />
                 ) : (
                     <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={data}>
+                        <BarChart data={displayedStats}>
                             <XAxis dataKey="label" />
                             <YAxis />
-                            <Tooltip />
+                            <Tooltip/>
                             <Bar dataKey={selectedKey} fill="#4f46e5" />
                         </BarChart>
                     </ResponsiveContainer>
