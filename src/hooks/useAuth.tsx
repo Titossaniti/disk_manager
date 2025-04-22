@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation"
 type User = {
     id: string
     email: string
-    name: string
+    pseudonym: string
     role: string
 }
 

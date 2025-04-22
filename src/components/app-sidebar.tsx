@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { LayoutDashboard, LogOut, Building2 } from "lucide-react"
+import { LayoutDashboard, LogOut, Disc3 } from "lucide-react"
 
 import {
     Sidebar,
@@ -36,17 +36,17 @@ export function AppSidebar() {
             <SidebarHeader>
                 <div className="flex items-center gap-2 px-4 py-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                        <Building2 className="h-4 w-4" />
+                        <Disc3 className="h-4 w-4" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="text-sm font-semibold">Acme Inc.</span>
-                        <span className="text-xs text-muted-foreground">Admin Portal</span>
+                        <span className="text-sm font-semibold">Disk Manager</span>
+                        <span className="text-xs text-muted-foreground">{user.pseudonym}</span>
                     </div>
                 </div>
             </SidebarHeader>
             <SidebarSeparator />
-            <SidebarContent>
-                <SidebarMenu>
+            <SidebarContent >
+                <SidebarMenu className="p-3">
                     {navItems.map((item) => (
                         <SidebarMenuItem key={item.href}>
                             <SidebarMenuButton asChild>
@@ -72,7 +72,7 @@ export function AppSidebar() {
                             <span className="text-xs text-muted-foreground">{user.email}</span>
                         </div>
                     </div>
-                    <Button variant="ghost" size="icon" onClick={logout}>
+                    <Button variant="destructive" className="hover:border-2 hover:border-red-400 hover:cursor-pointer" size="icon" onClick={logout}>
                         <LogOut className="h-4 w-4" />
                         <span className="sr-only">Logout</span>
                     </Button>

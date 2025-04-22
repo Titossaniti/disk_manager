@@ -1,6 +1,6 @@
 import type { ReactNode } from "react"
 import { AuthProvider } from "@/hooks/useAuth"
-import { SidebarProvider } from "@/components/ui/sidebar"
+import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { getSession } from "@/actions/auth"
 import { redirect } from "next/navigation"
@@ -17,9 +17,12 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
     return (
         <AuthProvider>
             <SidebarProvider>
-                <div className="flex min-h-svh">
+                <div className="flex w-full">
                     <AppSidebar />
-                    <main className="flex-1 overflow-auto p-6">{children}</main>
+                    <main className="flex-1 overflow-auto p-6">
+                        <SidebarTrigger />
+                        {children}
+                    </main>
                 </div>
             </SidebarProvider>
         </AuthProvider>
