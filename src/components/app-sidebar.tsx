@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { LayoutDashboard, LogOut, Disc3 } from "lucide-react"
+import {LayoutDashboard, LogOut, Disc3, ChartNoAxesColumn} from "lucide-react"
 
 import {
     Sidebar,
@@ -28,6 +28,11 @@ export function AppSidebar() {
             title: "Dashboard",
             icon: LayoutDashboard,
             href: "/dashboard",
+        },
+        {
+            title: "Statistiques",
+            icon: ChartNoAxesColumn,
+            href: "/statistics",
         },
     ]
 

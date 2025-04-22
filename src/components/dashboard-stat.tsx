@@ -109,7 +109,7 @@ export default function DashboardStat() {
     return (
         <div className="space-y-4">
             <div className="flex justify-end">
-                <Button variant="outline" size="sm" onClick={() => setShowNumbers(!showNumbers)}>
+                <Button variant="outline" className="hover:cursor-pointer" size="sm" onClick={() => setShowNumbers(!showNumbers)}>
                     {showNumbers ? "Masquer les chiffres" : "Afficher les chiffres"}
                 </Button>
             </div>
