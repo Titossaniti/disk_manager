@@ -120,7 +120,7 @@ export default function GlobalStatisticsChart() {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Statistiques mensuelles</CardTitle>
+                <CardTitle>Statistiques globales</CardTitle>
                 <div className="flex flex-wrap justify-between mt-4 gap-4">
                     <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
                         <p className="text-sm text-muted-foreground px-1">Affichage</p>
