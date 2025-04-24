@@ -40,11 +40,11 @@ const chartConfig = {
     },
     margin: {
         label: "Marge",
-        color: "hsl(220 70% 49.6%)",
+        color: "hsl(220 70% 49%)",
     },
     sold: {
         label: "Ventes",
-        color: "hsl(220 70% 49.6%)",
+        color: "hsl(220 70% 49%)",
     },
 } satisfies ChartConfig
 
