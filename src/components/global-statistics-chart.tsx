@@ -23,6 +23,8 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import {Separator} from "@radix-ui/react-select";
+import { useIsMobile } from "@/hooks/use-mobile"
 
 type MonthlyStat = {
     year: number
@@ -55,12 +57,15 @@ export default function GlobalStatisticsChart() {
     const [displayedStats, setDisplayedStats] = useState<MonthlyStat[]>([])
     const [loading, setLoading] = useState(true)
     const [viewMode, setViewMode] = useState<ViewMode>("sold")
+    const isMobile = useIsMobile()
 
     const [now] = useState(() => new Date())
     const [fromMonth, setFromMonth] = useState(() => now.getMonth())
     const [fromYear, setFromYear] = useState(() => now.getFullYear() - 1)
     const [toMonth, setToMonth] = useState(() => now.getMonth())
     const [toYear, setToYear] = useState(() => now.getFullYear())
+
+    const [groupBy, setGroupBy] = useState<"month" | "year">("month")
 
     const monthOptions = [...Array(12).keys()].map((m) => ({
         value: m,
@@ -114,8 +119,22 @@ export default function GlobalStatisticsChart() {
             return date >= from && date <= to
         })
 
-        setDisplayedStats(filtered)
-    }, [fromMonth, fromYear, toMonth, toYear, allStats])
+        if (groupBy === "year") {
+            const byYear = filtered.reduce<Record<number, MonthlyStat>>((acc, stat) => {
+                const { year, sold, revenue, margin } = stat
+                if (!acc[year]) {
+                    acc[year] = { year, month: 1, sold: 0, revenue: 0, margin: 0, label: String(year) }
+                }
+                acc[year].sold += sold
+                acc[year].revenue += revenue
+                acc[year].margin += margin
+                return acc
+            }, {})
+            setDisplayedStats(Object.values(byYear))
+        } else {
+            setDisplayedStats(filtered)
+        }
+    }, [fromMonth, fromYear, toMonth, toYear, allStats, groupBy])
 
     return (
         <Card>
@@ -135,16 +154,30 @@ export default function GlobalStatisticsChart() {
                                 variant={viewMode === "stacked" ? "default" : "outline"}
                                 onClick={() => setViewMode("stacked")}
                             >
-                                Chiffre d'affaires & Marge
+                                {isMobile ? "CA & Marge" : "Chiffre d'affaires & Marge"}
+                            </Button>
+                            <Separator className="w-[1px] bg-muted hidden sm:block" />
+                            <Button
+                                variant={groupBy === "month" ? "default" : "outline"}
+                                onClick={() => setGroupBy("month")}
+                            >
+                                Mensuel
+                            </Button>
+                            <Button
+                                variant={groupBy === "year" ? "default" : "outline"}
+                                onClick={() => setGroupBy("year")}
+                            >
+                                Annuel
                             </Button>
                         </div>
                     </div>
 
+
                     <div className="flex gap-4 flex-wrap">
-                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
+                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px] w-full sm:w-fit">
                             <p className="text-sm text-muted-foreground px-1">Début</p>
                             <div className="flex gap-2">
-                                <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
+                            <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
                                     <SelectTrigger className="w-[120px]"><SelectValue
                                         placeholder="Mois début"/></SelectTrigger>
                                     <SelectContent>
@@ -166,7 +199,7 @@ export default function GlobalStatisticsChart() {
                             </div>
                         </div>
 
-                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
+                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px] w-full sm:w-fit">
                             <p className="text-sm text-muted-foreground px-1">Fin</p>
                             <div className="flex gap-2">
                                 <Select value={String(toMonth)} onValueChange={(v) => setToMonth(Number(v))}>

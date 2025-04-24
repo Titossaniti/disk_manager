@@ -69,11 +69,11 @@ export function AppSidebar() {
                 <div className="flex items-center justify-between px-4 py-2">
                     <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8">
-                            <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} alt={user.name} />
-                            <AvatarFallback>{user?.name?.charAt(0)?.toUpperCase() ?? "?"}</AvatarFallback>
+                            <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} alt={user.pseudonym} />
+                            <AvatarFallback>{user?.pseudonym?.charAt(0)?.toUpperCase() ?? "?"}</AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
-                            <span className="text-sm font-medium">{user.name}</span>
+                            <span className="text-sm font-medium">{user.pseudonym}</span>
                             <span className="text-xs text-muted-foreground">{user.email}</span>
                         </div>
                     </div>

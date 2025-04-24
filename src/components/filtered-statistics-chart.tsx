@@ -28,6 +28,8 @@ import {
 import { BarChart, Bar, CartesianGrid, XAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Combobox } from "@/components/ui/combobox"
+import {Separator} from "@radix-ui/react-select";
+import {useIsMobile} from "@/hooks/use-mobile";
 
 type MonthlyStat = {
     year: number
@@ -74,8 +76,10 @@ export default function FilteredStatsChart() {
     const [allStats, setAllStats] = useState<MonthlyStat[]>([])
     const [displayedStats, setDisplayedStats] = useState<MonthlyStat[]>([])
     const [viewMode, setViewMode] = useState<ViewMode>("sold")
+    const isMobile = useIsMobile()
     const [loading, setLoading] = useState(false)
     const [showEmptyMessage, setShowEmptyMessage] = useState(false)
+    const [groupBy, setGroupBy] = useState<"month" | "year">("month")
 
     useEffect(() => {
         const fetchFilteredStats = async () => {
@@ -118,12 +122,35 @@ export default function FilteredStatsChart() {
         if (!allStats.length) return
         const from = new Date(fromYear, fromMonth)
         const to = new Date(toYear, toMonth)
+
         const filtered = allStats.filter((s) => {
             const date = new Date(s.year, s.month - 1)
             return date >= from && date <= to
         })
-        setDisplayedStats(filtered)
-    }, [fromMonth, fromYear, toMonth, toYear, allStats])
+
+        if (groupBy === "month") {
+            setDisplayedStats(filtered)
+        } else {
+            const grouped = filtered.reduce<Record<number, MonthlyStat>>((acc, item) => {
+                if (!acc[item.year]) {
+                    acc[item.year] = {
+                        year: item.year,
+                        month: 1,
+                        revenue: 0,
+                        margin: 0,
+                        sold: 0,
+                        label: String(item.year),
+                    }
+                }
+                acc[item.year].revenue += item.revenue
+                acc[item.year].margin += item.margin
+                acc[item.year].sold += item.sold
+                return acc
+            }, {})
+
+            setDisplayedStats(Object.values(grouped).sort((a, b) => a.year - b.year))
+        }
+    }, [fromMonth, fromYear, toMonth, toYear, allStats, groupBy])
 
     return (
         <Card>
@@ -143,17 +170,32 @@ export default function FilteredStatsChart() {
                                 variant={viewMode === "stacked" ? "default" : "outline"}
                                 onClick={() => setViewMode("stacked")}
                             >
-                                Chiffre d'affaires & Marge
+                                {isMobile ? "CA & Marge" : "Chiffre d'affaires & Marge"}
+                            </Button>
+                            <Separator className="w-[1px] bg-muted hidden sm:block" />
+                            <Button
+                                variant={groupBy === "month" ? "default" : "outline"}
+                                onClick={() => setGroupBy("month")}
+                            >
+                                Mensuel
+                            </Button>
+                            <Button
+                                variant={groupBy === "year" ? "default" : "outline"}
+                                onClick={() => setGroupBy("year")}
+                            >
+                                Annuel
                             </Button>
                         </div>
                     </div>
 
+
                     <div className="flex gap-4 flex-wrap">
-                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
+                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px] w-full sm:w-fit">
                             <p className="text-sm text-muted-foreground px-1">Début</p>
                             <div className="flex gap-2">
                                 <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
-                                    <SelectTrigger className="w-[120px]"><SelectValue placeholder="Mois début" /></SelectTrigger>
+                                    <SelectTrigger className="w-[120px]"><SelectValue
+                                        placeholder="Mois début"/></SelectTrigger>
                                     <SelectContent>
                                         {monthOptions.map((m) => (
                                             <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
@@ -162,7 +204,8 @@ export default function FilteredStatsChart() {
                                 </Select>
 
                                 <Select value={String(fromYear)} onValueChange={(v) => setFromYear(Number(v))}>
-                                    <SelectTrigger className="w-[100px]"><SelectValue placeholder="Année début" /></SelectTrigger>
+                                    <SelectTrigger className="w-[100px]"><SelectValue
+                                        placeholder="Année début"/></SelectTrigger>
                                     <SelectContent>
                                         {yearOptions.map((y) => (
                                             <SelectItem key={y} value={String(y)}>{y}</SelectItem>
@@ -172,11 +215,12 @@ export default function FilteredStatsChart() {
                             </div>
                         </div>
 
-                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
+                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px] w-full sm:w-fit">
                             <p className="text-sm text-muted-foreground px-1">Fin</p>
                             <div className="flex gap-2">
                                 <Select value={String(toMonth)} onValueChange={(v) => setToMonth(Number(v))}>
-                                    <SelectTrigger className="w-[120px]"><SelectValue placeholder="Mois fin" /></SelectTrigger>
+                                    <SelectTrigger className="w-[120px]"><SelectValue
+                                        placeholder="Mois fin"/></SelectTrigger>
                                     <SelectContent>
                                         {monthOptions.map((m) => (
                                             <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
@@ -185,7 +229,8 @@ export default function FilteredStatsChart() {
                                 </Select>
 
                                 <Select value={String(toYear)} onValueChange={(v) => setToYear(Number(v))}>
-                                    <SelectTrigger className="w-[100px]"><SelectValue placeholder="Année fin" /></SelectTrigger>
+                                    <SelectTrigger className="w-[100px]"><SelectValue
+                                        placeholder="Année fin"/></SelectTrigger>
                                     <SelectContent>
                                         {yearOptions.map((y) => (
                                             <SelectItem key={y} value={String(y)}>{y}</SelectItem>
