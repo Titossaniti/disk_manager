@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
-import {Separator} from "@radix-ui/react-select";
+import {Separator} from "@/components/ui/separator"
 import { useIsMobile } from "@/hooks/use-mobile"
 
 type MonthlyStat = {
@@ -66,7 +66,14 @@ export default function GlobalStatisticsChart() {
     const [toYear, setToYear] = useState(() => now.getFullYear())
 
     const [groupBy, setGroupBy] = useState<"month" | "year">("month")
-
+    const [globalStats, setGlobalStats] = useState({
+        sold: 0,
+        inSale: 0,
+        notInSale: 0,
+        revenue: 0,
+        margin: 0,
+    })
+    const showEmptyMessage = !loading && displayedStats.length === 0
     const monthOptions = [...Array(12).keys()].map((m) => ({
         value: m,
         label: format(new Date(2024, m, 1), "MMMM", { locale: fr }),
@@ -82,7 +89,13 @@ export default function GlobalStatisticsChart() {
                     cache: "no-store",
                 })
                 const json = await res.json()
-
+                setGlobalStats({
+                    sold: json.sold,
+                    inSale: json.inSale,
+                    notInSale: json.notInSale,
+                    revenue: json.revenue,
+                    margin: json.margin,
+                })
                 const monthlyStats = json.monthlyStats as MonthlyStat[]
 
                 const withLabels = monthlyStats.map((item) => {
@@ -156,7 +169,7 @@ export default function GlobalStatisticsChart() {
                             >
                                 {isMobile ? "CA & Marge" : "Chiffre d'affaires & Marge"}
                             </Button>
-                            <Separator className="w-[1px] bg-muted hidden sm:block" />
+                            <Separator orientation={"vertical"} className="hidden sm:block" />
                             <Button
                                 variant={groupBy === "month" ? "default" : "outline"}
                                 onClick={() => setGroupBy("month")}
@@ -222,8 +235,6 @@ export default function GlobalStatisticsChart() {
                                         </SelectContent>
                                     </Select>
                                 )}
-
-
                                 <Select value={String(toYear)} onValueChange={(v) => setToYear(Number(v))}>
                                     <SelectTrigger className="w-[100px]"><SelectValue
                                         placeholder="Année fin"/></SelectTrigger>
@@ -241,11 +252,13 @@ export default function GlobalStatisticsChart() {
 
             <CardContent>
                 {loading ? (
-                    <Skeleton className="w-full h-[300px]"/>
-                ) : displayedStats.length === 0 ? (
-                    <p className="text-sm text-muted-foreground">Aucune donnée pour cette période.</p>
+                    <Skeleton className="w-full h-[300px]" />
+                ) : showEmptyMessage ? (
+                    <p className="text-base text-center text-muted-foreground py-4">
+                        Aucune donnée pour cette période.
+                    </p>
                 ) : (
-                    <ChartContainer config={chartConfig} className="h-[500px] w-full">
+                    <ChartContainer config={chartConfig} className="h-[400px] w-full">
                         <BarChart data={displayedStats}>
                             <CartesianGrid vertical={false}/>
                             <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false}/>
@@ -264,6 +277,46 @@ export default function GlobalStatisticsChart() {
                             )}
                         </BarChart>
                     </ChartContainer>
+                )}
+                <Separator className="mt-4"/>
+                {!loading && !showEmptyMessage && displayedStats.length > 0 && (
+                    <div className="mt-6">
+                        <p className="text-sm font-medium mb-4 text-muted-foreground px-1">
+                            Statistiques générales (toutes années confondues)
+                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+                            <Card className="p-4">
+                                <div className="text-xs text-muted-foreground mb-1">Vendus</div>
+                                <div className="text-lg font-semibold text-foreground">
+                                    {new Intl.NumberFormat("fr-FR").format(globalStats.sold)}
+                                </div>
+                            </Card>
+                            <Card className="p-4">
+                                <div className="text-xs text-muted-foreground mb-1">En vente</div>
+                                <div className="text-lg font-semibold text-foreground">
+                                    {new Intl.NumberFormat("fr-FR").format(globalStats.inSale)}
+                                </div>
+                            </Card>
+                            <Card className="p-4">
+                                <div className="text-xs text-muted-foreground mb-1">À mettre en vente</div>
+                                <div className="text-lg font-semibold text-foreground">
+                                    {new Intl.NumberFormat("fr-FR").format(globalStats.notInSale)}
+                                </div>
+                            </Card>
+                            <Card className="p-4">
+                                <div className="text-xs text-muted-foreground mb-1">Chiffre d'affaires</div>
+                                <div className="text-lg font-semibold text-foreground">
+                                    {new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(globalStats.revenue)} €
+                                </div>
+                            </Card>
+                            <Card className="p-4">
+                                <div className="text-xs text-muted-foreground mb-1">Marge</div>
+                                <div className="text-lg font-semibold text-foreground">
+                                    {new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(globalStats.margin)} €
+                                </div>
+                            </Card>
+                        </div>
+                    </div>
                 )}
             </CardContent>
         </Card>
