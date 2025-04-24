@@ -106,8 +106,8 @@ export default function GlobalStatisticsChart() {
 
     useEffect(() => {
         if (!allStats.length) return
-        const from = new Date(fromYear, fromMonth)
-        const to = new Date(toYear, toMonth)
+        const from = new Date(fromYear, groupBy === "year" ? 0 : fromMonth)
+        const to = new Date(toYear, groupBy === "year" ? 11 : toMonth)
 
         if (from > to) {
             setDisplayedStats([])
@@ -177,15 +177,21 @@ export default function GlobalStatisticsChart() {
                         <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px] w-full sm:w-fit">
                             <p className="text-sm text-muted-foreground px-1">Début</p>
                             <div className="flex gap-2">
-                            <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
-                                    <SelectTrigger className="w-[120px]"><SelectValue
-                                        placeholder="Mois début"/></SelectTrigger>
-                                    <SelectContent>
-                                        {monthOptions.map((m) => (
-                                            <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                {groupBy === "month" && (
+                                    <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
+                                        <SelectTrigger className="w-[120px]">
+                                            <SelectValue placeholder="Mois début" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {monthOptions.map((m) => (
+                                                <SelectItem key={m.value} value={String(m.value)}>
+                                                    {m.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+
 
                                 <Select value={String(fromYear)} onValueChange={(v) => setFromYear(Number(v))}>
                                     <SelectTrigger className="w-[100px]"><SelectValue
@@ -202,15 +208,21 @@ export default function GlobalStatisticsChart() {
                         <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px] w-full sm:w-fit">
                             <p className="text-sm text-muted-foreground px-1">Fin</p>
                             <div className="flex gap-2">
-                                <Select value={String(toMonth)} onValueChange={(v) => setToMonth(Number(v))}>
-                                    <SelectTrigger className="w-[120px]"><SelectValue
-                                        placeholder="Mois fin"/></SelectTrigger>
-                                    <SelectContent>
-                                        {monthOptions.map((m) => (
-                                            <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                {groupBy === "month" && (
+                                    <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
+                                        <SelectTrigger className="w-[120px]">
+                                            <SelectValue placeholder="Mois début" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {monthOptions.map((m) => (
+                                                <SelectItem key={m.value} value={String(m.value)}>
+                                                    {m.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                )}
+
 
                                 <Select value={String(toYear)} onValueChange={(v) => setToYear(Number(v))}>
                                     <SelectTrigger className="w-[100px]"><SelectValue
