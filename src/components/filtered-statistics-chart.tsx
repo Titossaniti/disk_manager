@@ -90,9 +90,9 @@ export default function FilteredStatsChart() {
             setLoading(true)
 
             const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/stats/by-month/filtered`)
-            url.searchParams.append("artist", artist)
-            url.searchParams.append("buyPlace", buyPlace)
-            url.searchParams.append("sellingPlace", sellingPlace)
+            if (artist) url.searchParams.append("artist", artist)
+            if (buyPlace.length >= 3) url.searchParams.append("buyPlace", buyPlace)
+            if (sellingPlace.length >= 3) url.searchParams.append("sellingPlace", sellingPlace)
 
             try {
                 const res = await fetch(url.toString(), { credentials: "include", cache: "no-store" })
