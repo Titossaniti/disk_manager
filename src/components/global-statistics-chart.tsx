@@ -121,83 +121,100 @@ export default function GlobalStatisticsChart() {
         <Card>
             <CardHeader>
                 <CardTitle>Statistiques mensuelles</CardTitle>
-                <div className="flex flex-wrap justify-between mt-4 gap-2">
-                    <div className="flex flex-wrap gap-2">
-                        <Button
-                            variant={viewMode === "sold" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setViewMode("sold")}
-                        >
-                            Ventes
-                        </Button>
-                        <Button
-                            variant={viewMode === "stacked" ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setViewMode("stacked")}
-                        >
-                            Chiffre d'affaires & Marge
-                        </Button>
+                <div className="flex flex-wrap justify-between mt-4 gap-4">
+                    <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
+                        <p className="text-sm text-muted-foreground px-1">Affichage</p>
+                        <div className="flex flex-wrap gap-2">
+                            <Button
+                                variant={viewMode === "sold" ? "default" : "outline"}
+                                onClick={() => setViewMode("sold")}
+                            >
+                                Ventes
+                            </Button>
+                            <Button
+                                variant={viewMode === "stacked" ? "default" : "outline"}
+                                onClick={() => setViewMode("stacked")}
+                            >
+                                Chiffre d'affaires & Marge
+                            </Button>
+                        </div>
                     </div>
 
-                    <div className="flex gap-2 flex-wrap">
-                        <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
-                            <SelectTrigger className="w-[120px]"><SelectValue placeholder="Mois début" /></SelectTrigger>
-                            <SelectContent>
-                                {monthOptions.map((m) => (
-                                    <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                    <div className="flex gap-4 flex-wrap">
+                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
+                            <p className="text-sm text-muted-foreground px-1">Début</p>
+                            <div className="flex gap-2">
+                                <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
+                                    <SelectTrigger className="w-[120px]"><SelectValue
+                                        placeholder="Mois début"/></SelectTrigger>
+                                    <SelectContent>
+                                        {monthOptions.map((m) => (
+                                            <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
 
-                        <Select value={String(fromYear)} onValueChange={(v) => setFromYear(Number(v))}>
-                            <SelectTrigger className="w-[100px]"><SelectValue placeholder="Année début" /></SelectTrigger>
-                            <SelectContent>
-                                {yearOptions.map((y) => (
-                                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                                <Select value={String(fromYear)} onValueChange={(v) => setFromYear(Number(v))}>
+                                    <SelectTrigger className="w-[100px]"><SelectValue
+                                        placeholder="Année début"/></SelectTrigger>
+                                    <SelectContent>
+                                        {yearOptions.map((y) => (
+                                            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
 
-                        <Select value={String(toMonth)} onValueChange={(v) => setToMonth(Number(v))}>
-                            <SelectTrigger className="w-[120px]"><SelectValue placeholder="Mois fin" /></SelectTrigger>
-                            <SelectContent>
-                                {monthOptions.map((m) => (
-                                    <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                        <div className="border rounded-md p-2 flex gap-2 flex-col min-w-[220px]">
+                            <p className="text-sm text-muted-foreground px-1">Fin</p>
+                            <div className="flex gap-2">
+                                <Select value={String(toMonth)} onValueChange={(v) => setToMonth(Number(v))}>
+                                    <SelectTrigger className="w-[120px]"><SelectValue
+                                        placeholder="Mois fin"/></SelectTrigger>
+                                    <SelectContent>
+                                        {monthOptions.map((m) => (
+                                            <SelectItem key={m.value} value={String(m.value)}>{m.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
 
-                        <Select value={String(toYear)} onValueChange={(v) => setToYear(Number(v))}>
-                            <SelectTrigger className="w-[100px]"><SelectValue placeholder="Année fin" /></SelectTrigger>
-                            <SelectContent>
-                                {yearOptions.map((y) => (
-                                    <SelectItem key={y} value={String(y)}>{y}</SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
+                                <Select value={String(toYear)} onValueChange={(v) => setToYear(Number(v))}>
+                                    <SelectTrigger className="w-[100px]"><SelectValue
+                                        placeholder="Année fin"/></SelectTrigger>
+                                    <SelectContent>
+                                        {yearOptions.map((y) => (
+                                            <SelectItem key={y} value={String(y)}>{y}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </CardHeader>
 
             <CardContent>
                 {loading ? (
-                    <Skeleton className="w-full h-[300px]" />
+                    <Skeleton className="w-full h-[300px]"/>
                 ) : displayedStats.length === 0 ? (
                     <p className="text-sm text-muted-foreground">Aucune donnée pour cette période.</p>
                 ) : (
                     <ChartContainer config={chartConfig} className="h-[500px] w-full">
                         <BarChart data={displayedStats}>
-                            <CartesianGrid vertical={false} />
-                            <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} />
-                            <ChartTooltip content={<ChartTooltipContent className="min-w-[260px] text-base p-2"/>} />
-                            <ChartLegend content={<ChartLegendContent />} />
+                            <CartesianGrid vertical={false}/>
+                            <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false}/>
+                            <ChartTooltip content={<ChartTooltipContent className="min-w-[260px] text-base p-2"/>}/>
+                            <ChartLegend content={<ChartLegendContent/>}/>
 
                             {viewMode === "sold" ? (
-                                <Bar dataKey="sold" fill={chartConfig.sold.color} radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="sold" fill={chartConfig.sold.color} radius={[4, 4, 0, 0]}/>
                             ) : (
                                 <>
-                                    <Bar dataKey="margin" stackId="a" fill={chartConfig.margin.color} radius={[0, 0, 0, 0]} />
-                                    <Bar dataKey="revenue" stackId="a" fill={chartConfig.revenue.color} radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="margin" stackId="a" fill={chartConfig.margin.color}
+                                         radius={[0, 0, 0, 0]}/>
+                                    <Bar dataKey="revenue" stackId="a" fill={chartConfig.revenue.color}
+                                         radius={[4, 4, 0, 0]}/>
                                 </>
                             )}
                         </BarChart>
