@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import DashboardStat from "@/components/dashboard-stat";
+import { Separator } from "@/components/ui/separator"
 
 export default function DashboardPage() {
     return (
-        <div className="space-y-6 pt-5">
+        <div className="space-y-6 pt-4">
             <div>
                 <h1 className="text-3xl font-bold">Tableau de bord</h1>
             </div>
@@ -20,6 +21,8 @@ export default function DashboardPage() {
                 {/*</Card>*/}
 
             <DashboardStat />
+            <Separator />
+
         </div>
     )
 }

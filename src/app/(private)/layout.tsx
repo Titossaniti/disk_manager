@@ -20,7 +20,7 @@ export default async function PrivateLayout({ children }: { children: ReactNode 
                 <div className="flex w-full">
                     <AppSidebar />
                     <main className="flex-1 overflow-auto p-6">
-                        <SidebarTrigger />
+                        <SidebarTrigger className="hover:cursor-pointer"/>
                         {children}
                     </main>
                 </div>

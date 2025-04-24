@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 type Stats = {
     countInSale: number
     countSold: number
+    countNotInSale: number
     totalRevenue: number
     totalMargin: number
     countSoldThisPeriod: number | null
@@ -114,8 +115,9 @@ export default function DashboardStat() {
                 </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <StatCard title="En vente" value={currentStats?.countInSale} />
                 <StatCard title="Vendus" value={currentStats?.countSold} />
+                <StatCard title="En vente" value={currentStats?.countInSale} />
+                <StatCard title="Pas encore en vente" value={lastMonthStats?.countNotInSale} />
                 <StatCard title="Marge totale" value={currentStats?.totalMargin} unit="€" />
                 <StatCard title="Vendus ce mois-ci" value={currentStats?.countSoldThisPeriod} />
                 <StatCard title="Vendus le mois dernier" value={lastMonthStats?.countSoldThisPeriod} />

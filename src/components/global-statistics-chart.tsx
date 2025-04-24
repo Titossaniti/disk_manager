@@ -30,7 +30,7 @@ type MonthlyStat = {
     revenue: number
     margin: number
     sold: number
-    label: string
+    label?: string
 }
 
 const chartConfig = {
@@ -50,17 +50,17 @@ const chartConfig = {
 
 type ViewMode = "stacked" | "sold"
 
-export default function StatisticsChart() {
+export default function GlobalStatisticsChart() {
     const [allStats, setAllStats] = useState<MonthlyStat[]>([])
     const [displayedStats, setDisplayedStats] = useState<MonthlyStat[]>([])
     const [loading, setLoading] = useState(true)
     const [viewMode, setViewMode] = useState<ViewMode>("sold")
 
-    const now = new Date()
-    const [fromMonth, setFromMonth] = useState<number>(now.getMonth())
-    const [fromYear, setFromYear] = useState<number>(now.getFullYear() - 1)
-    const [toMonth, setToMonth] = useState<number>(now.getMonth())
-    const [toYear, setToYear] = useState<number>(now.getFullYear())
+    const [now] = useState(() => new Date())
+    const [fromMonth, setFromMonth] = useState(() => now.getMonth())
+    const [fromYear, setFromYear] = useState(() => now.getFullYear() - 1)
+    const [toMonth, setToMonth] = useState(() => now.getMonth())
+    const [toYear, setToYear] = useState(() => now.getFullYear())
 
     const monthOptions = [...Array(12).keys()].map((m) => ({
         value: m,
@@ -72,15 +72,22 @@ export default function StatisticsChart() {
         async function fetchStats() {
             setLoading(true)
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/stats/by-month`, {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/stats/by-month/filtered`, {
                     credentials: "include",
                     cache: "no-store",
                 })
                 const json = await res.json()
-                const withLabels = json.map((item: MonthlyStat) => ({
-                    ...item,
-                    label: format(new Date(item.year, item.month - 1, 1), "MMM yy", { locale: fr }),
-                }))
+
+                const monthlyStats = json.monthlyStats as MonthlyStat[]
+
+                const withLabels = monthlyStats.map((item) => {
+                    const label =
+                        typeof window !== "undefined"
+                            ? format(new Date(item.year, item.month - 1, 1), "MMM yy", { locale: fr })
+                            : `${item.month}/${item.year}`
+                    return { ...item, label }
+                })
+
                 setAllStats(withLabels)
             } catch (err) {
                 console.error("Erreur fetch:", err)
@@ -115,7 +122,6 @@ export default function StatisticsChart() {
             <CardHeader>
                 <CardTitle>Statistiques mensuelles</CardTitle>
                 <div className="flex flex-wrap justify-between mt-4 gap-2">
-                    {/* Boutons : Vues */}
                     <div className="flex flex-wrap gap-2">
                         <Button
                             variant={viewMode === "sold" ? "default" : "outline"}
@@ -133,7 +139,6 @@ export default function StatisticsChart() {
                         </Button>
                     </div>
 
-                    {/* Sélecteurs de période */}
                     <div className="flex gap-2 flex-wrap">
                         <Select value={String(fromMonth)} onValueChange={(v) => setFromMonth(Number(v))}>
                             <SelectTrigger className="w-[120px]"><SelectValue placeholder="Mois début" /></SelectTrigger>
@@ -174,25 +179,25 @@ export default function StatisticsChart() {
                 </div>
             </CardHeader>
 
-            <CardContent >
+            <CardContent>
                 {loading ? (
                     <Skeleton className="w-full h-[300px]" />
                 ) : displayedStats.length === 0 ? (
                     <p className="text-sm text-muted-foreground">Aucune donnée pour cette période.</p>
                 ) : (
                     <ChartContainer config={chartConfig} className="h-[500px] w-full">
-                        <BarChart data={displayedStats} >
+                        <BarChart data={displayedStats}>
                             <CartesianGrid vertical={false} />
                             <XAxis dataKey="label" tickLine={false} tickMargin={10} axisLine={false} />
-                            <ChartTooltip content={<ChartTooltipContent />} />
+                            <ChartTooltip content={<ChartTooltipContent className="min-w-[260px] text-base p-2"/>} />
                             <ChartLegend content={<ChartLegendContent />} />
 
                             {viewMode === "sold" ? (
-                                <Bar dataKey="sold" fill="var(--color-sold)" radius={[4, 4, 0, 0]} />
+                                <Bar dataKey="sold" fill={chartConfig.sold.color} radius={[4, 4, 0, 0]} />
                             ) : (
                                 <>
-                                    <Bar dataKey="margin" stackId="a" fill="var(--color-margin)" radius={[0, 0, 0, 0]} />
-                                    <Bar dataKey="revenue" stackId="a" fill="var(--color-revenue)" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="margin" stackId="a" fill={chartConfig.margin.color} radius={[0, 0, 0, 0]} />
+                                    <Bar dataKey="revenue" stackId="a" fill={chartConfig.revenue.color} radius={[4, 4, 0, 0]} />
                                 </>
                             )}
                         </BarChart>
