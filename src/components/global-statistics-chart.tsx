@@ -66,7 +66,7 @@ export default function GlobalStatisticsChart() {
         value: m,
         label: format(new Date(2024, m, 1), "MMMM", { locale: fr }),
     }))
-    const yearOptions = Array.from({ length: now.getFullYear() - 2000 + 1 }, (_, i) => 2000 + i)
+    const yearOptions = Array.from({ length: now.getFullYear() - 2003 + 1 }, (_, i) => 2003 + i)
 
     useEffect(() => {
         async function fetchStats() {

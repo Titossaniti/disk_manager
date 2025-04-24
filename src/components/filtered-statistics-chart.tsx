@@ -66,7 +66,7 @@ export default function FilteredStatsChart() {
         value: m,
         label: format(new Date(2024, m, 1), "MMMM", { locale: fr }),
     }))
-    const yearOptions = Array.from({ length: now.getFullYear() - 2000 + 1 }, (_, i) => 2000 + i)
+    const yearOptions = Array.from({ length: now.getFullYear() - 2003 + 1 }, (_, i) => 2003 + i)
 
     const [artist, setArtist] = useState("")
     const [buyPlace, setBuyPlace] = useState("")
@@ -75,10 +75,18 @@ export default function FilteredStatsChart() {
     const [displayedStats, setDisplayedStats] = useState<MonthlyStat[]>([])
     const [viewMode, setViewMode] = useState<ViewMode>("sold")
     const [loading, setLoading] = useState(false)
+    const [showEmptyMessage, setShowEmptyMessage] = useState(false)
 
     useEffect(() => {
         const fetchFilteredStats = async () => {
-            if (!artist || buyPlace.length < 3 || sellingPlace.length < 3) return
+            if (!artist && buyPlace.length < 3 && sellingPlace.length < 3) {
+                setAllStats([])
+                setDisplayedStats([])
+                setShowEmptyMessage(true)
+                return
+            }
+            setShowEmptyMessage(false)
+
             setLoading(true)
 
             const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/stats/by-month/filtered`)
@@ -205,6 +213,8 @@ export default function FilteredStatsChart() {
             <CardContent>
                 {loading ? (
                     <Skeleton className="w-full h-[300px]" />
+                ) : showEmptyMessage ? (
+                    <p className="text-sm text-muted-foreground">Veuillez sélectionner au moins un filtre.</p>
                 ) : displayedStats.every((d) => d.revenue === 0 && d.margin === 0 && d.sold === 0) ? (
                     <p className="text-sm text-muted-foreground">Aucune donnée pour ce filtrage.</p>
                 ) : (
