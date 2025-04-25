@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import DashboardStat from "@/components/dashboard-stat";
 import { Separator } from "@/components/ui/separator"
+import LiteVinyleTable from "@/components/lite-vinyle-table";
 
 export default function DashboardPage() {
     return (
@@ -22,7 +23,7 @@ export default function DashboardPage() {
 
             <DashboardStat />
             <Separator />
-
+            <LiteVinyleTable />
         </div>
     )
 }

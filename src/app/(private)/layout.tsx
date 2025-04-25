@@ -1,30 +1,16 @@
-import type { ReactNode } from "react"
-import { AuthProvider } from "@/hooks/useAuth"
-import {SidebarProvider, SidebarTrigger} from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import { getSession } from "@/actions/auth"
-import { redirect } from "next/navigation"
+import type { ReactNode } from "react";
+import { getSession } from "@/actions/auth";
+import { redirect } from "next/navigation";
+import ClientWrapper from "@/components/layout/client-wrapper";
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 export default async function PrivateLayout({ children }: { children: ReactNode }) {
-    const session = await getSession()
+    const session = await getSession();
 
     if (!session) {
-        redirect("/login")
+        redirect("/login");
     }
 
-    return (
-        <AuthProvider>
-            <SidebarProvider>
-                <div className="flex w-full">
-                    <AppSidebar />
-                    <main className="flex-1 overflow-auto p-6">
-                        <SidebarTrigger className="hover:cursor-pointer"/>
-                        {children}
-                    </main>
-                </div>
-            </SidebarProvider>
-        </AuthProvider>
-    )
+    return <ClientWrapper>{children}</ClientWrapper>;
 }
