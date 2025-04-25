@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import {LayoutDashboard, LogOut, Disc3, ChartNoAxesColumn} from "lucide-react"
+import {LayoutDashboard, LogOut, Disc3, ChartNoAxesColumn, DiscAlbum} from "lucide-react"
 
 import {
     Sidebar,
@@ -27,12 +27,17 @@ export function AppSidebar() {
         {
             title: "Dashboard",
             icon: LayoutDashboard,
-            href: "/dashboard",
+            href: "/home",
         },
         {
             title: "Statistiques",
             icon: ChartNoAxesColumn,
             href: "/statistics",
+        },
+        {
+            title: "Mes disques",
+            icon: Disc3,
+            href: "/vinyles",
         },
     ]
 
@@ -41,7 +46,7 @@ export function AppSidebar() {
             <SidebarHeader>
                 <div className="flex items-center gap-2 px-4 py-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                        <Disc3 className="h-4 w-4" />
+                        <DiscAlbum className="h-4 w-4" />
                     </div>
                     <div className="flex flex-col">
                         <span className="text-sm font-semibold">Disk Manager</span>

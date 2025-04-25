@@ -22,8 +22,7 @@ export default function DashboardPage() {
                 {/*</Card>*/}
 
             <DashboardStat />
-            <Separator />
-            <LiteVinyleTable />
+            {/*<Separator />*/}
         </div>
     )
 }
