@@ -1,13 +1,25 @@
+"use client";
 
-import { Metadata } from "next";
 import LiteVinylesTable from "@/components/lite-vinyle-table";
 
-export const metadata: Metadata = {
-    title: "Mes disques",
-    description: "Liste complète et filtrable des vinyles",
-};
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import React from "react";
 
 export default function VinylesPage() {
+
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const deleted = searchParams.get("deleted");
+
+    React.useEffect(() => {
+        if (deleted) {
+            toast.success("Le disque a été supprimé avec succès !");
+            const newUrl = window.location.pathname;
+            router.replace(newUrl);
+        }
+    }, [deleted]);
+
     return (
         <div className="space-y-6 p-6">
             <div className="space-y-1">

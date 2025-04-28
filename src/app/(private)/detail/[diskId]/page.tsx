@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
+import { AnimatePresence, motion } from "framer-motion";
 
 import {
     Input,
@@ -25,7 +26,8 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogFooter
+    DialogFooter,
+    Skeleton,
 } from "@/components/ui";
 
 interface Vinyle {
@@ -67,6 +69,7 @@ interface Vinyle {
 export default function DetailPage() {
     const params = useParams();
     const router = useRouter();
+    const searchParams = useSearchParams();
     const queryClient = useQueryClient();
 
     const diskId = params.diskId?.toString().split("-")[0];
@@ -85,6 +88,7 @@ export default function DetailPage() {
     const [editData, setEditData] = useState<Partial<Vinyle>>({});
     const [confirmEditOpen, setConfirmEditOpen] = useState(false);
     const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState("achat");
 
     const updateVinyle = useMutation({
         mutationFn: async (updatedData: Partial<Vinyle>) => {
@@ -109,23 +113,53 @@ export default function DetailPage() {
             });
         },
         onSuccess: () => {
-            toast.success("Disque supprimé avec succès !");
-            router.push("/vinyles");
+            router.push("/vinyles?deleted=true");
         },
         onError: () => {
             toast.error("Erreur lors de la suppression du disque");
         },
     });
 
-    if (isLoading) return <div className="p-4">Chargement...</div>;
+    useEffect(() => {
+        if (searchParams.get("deleted")) {
+            toast.success("Le disque a été supprimé !");
+            router.replace("/vinyles");
+        }
+    }, [searchParams, router]);
+
+    if (isLoading) {
+        return (
+            <div className="p-4 space-y-4">
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-64 w-full" />
+            </div>
+        );
+    }
+
     if (isError || !data) return <div className="p-4 text-red-600">Erreur de chargement</div>;
 
     const handleChange = (name: string, value: any) => {
         setEditData(prev => ({ ...prev, [name]: value }));
     };
 
+    const renderField = (label: string, field: keyof Vinyle, isFullWidth = false) => (
+        <div className={isFullWidth ? "col-span-2" : ""}>
+            <Label>{label}</Label>
+            {isEditing ? (
+                <Input defaultValue={data[field]?.toString() || ""} onChange={(e) => handleChange(field, e.target.value)} />
+            ) : (
+                <p>{data[field] || "-"}</p>
+            )}
+        </div>
+    );
+
     return (
         <div className="p-6 space-y-6">
+            <Button variant="outline" onClick={() => router.push("/vinyles")} className="mb-4">
+                ← Retour aux disques
+            </Button>
+
             <div className="flex justify-between items-center">
                 <h1 className="text-2xl font-bold">
                     {data.artist} - {data.title}
@@ -147,7 +181,10 @@ export default function DetailPage() {
                                     <p>Êtes-vous sûr de vouloir modifier les informations de ce disque ?</p>
                                     <DialogFooter className="flex gap-2 pt-4">
                                         <Button variant="outline" onClick={() => setConfirmEditOpen(false)}>Annuler</Button>
-                                        <Button onClick={() => updateVinyle.mutate(editData)}>Confirmer</Button>
+                                        <Button onClick={() => {
+                                            const fullData = { ...data, ...editData };
+                                            updateVinyle.mutate(fullData);
+                                        }}>Confirmer</Button>
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
@@ -173,123 +210,116 @@ export default function DetailPage() {
 
             <Separator />
 
+            {/* Informations principales */}
             <Card>
                 <CardHeader>
                     <CardTitle>Informations principales</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <Label>ID</Label>
-                        <p>{data.id}</p>
-                    </div>
-                    <div>
-                        <Label>Marge (€)</Label>
-                        <p>{data.margin}</p>
-                    </div>
-                    <div className="col-span-2">
-                        <Label>Support</Label>
-                        {isEditing ? (
-                            <Input defaultValue={data.support} onChange={(e) => handleChange("support", e.target.value)} />
-                        ) : (
-                            <p>{data.support}</p>
-                        )}
-                    </div>
+                    {renderField("Artiste", "artist")}
+                    {renderField("Titre", "title")}
+                    {renderField("Support", "support")}
+                    {renderField("Pressage", "countryYear")}
+                    {renderField("Label", "label")}
+                    {renderField("Genre", "genre")}
+                    {renderField("État du disque", "diskCondition")}
+                    {renderField("Référence", "ref")}
+                    {renderField("Notes", "notes", true)}
+                    {renderField("Statut de vente", "sellingStatus")}
+                    {renderField("Prix d'achat (€)", "netBuyPrice")}
+                    {data.sellingStatus === "vendu" && (
+                        <>
+                            {renderField("Prix de vente (€)", "netSellingPrice")}
+                            {renderField("Marge (€)", "margin")}
+                        </>
+                    )}
                 </CardContent>
             </Card>
 
-            {/* Onglets */}
-            <Tabs defaultValue="achat" className="w-full">
+            {/* Onglets animés */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full justify-start gap-2">
                     <TabsTrigger value="achat">Achat</TabsTrigger>
                     <TabsTrigger value="vente">Vente</TabsTrigger>
                     <TabsTrigger value="listing">Listing</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="achat">
-                    <Card className="mt-4">
-                        <CardHeader>
-                            <CardTitle>Informations d'achat</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label>Lieu d'achat</Label>
-                                <p>{data.buyPlace}</p>
-                            </div>
-                            <div>
-                                <Label>Date d'achat</Label>
-                                <p>{data.buyDate}</p>
-                            </div>
-                            <div>
-                                <Label>Prix d'achat (€)</Label>
-                                <p>{data.netBuyPrice}</p>
-                            </div>
-                            <div>
-                                <Label>Frais d'achat (€)</Label>
-                                <p>{data.buyDeliveryFees}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                <AnimatePresence mode="wait">
+                    {activeTab === "achat" && (
+                        <TabsContent value="achat" asChild>
+                            <motion.div
+                                key="achat"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.25 }}
+                            >
+                                <Card className="mt-4">
+                                    <CardHeader><CardTitle>Informations d'achat</CardTitle></CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderField("Lieu d'achat", "buyPlace")}
+                                        {renderField("Date d'achat", "buyDate")}
+                                        {renderField("Prix d'achat (€)", "netBuyPrice")}
+                                        {renderField("Frais d'achat (€)", "buyDeliveryFees")}
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        </TabsContent>
+                    )}
 
-                <TabsContent value="vente">
-                    <Card className="mt-4">
-                        <CardHeader>
-                            <CardTitle>Informations de vente</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label>Lieu de vente</Label>
-                                <p>{data.sellingPlace}</p>
-                            </div>
-                            <div>
-                                <Label>Date de vente</Label>
-                                <p>{data.sellingDate}</p>
-                            </div>
-                            <div>
-                                <Label>Prix de vente (€)</Label>
-                                <p>{data.netSellingPrice}</p>
-                            </div>
-                            <div>
-                                <Label>Frais de vente (€)</Label>
-                                <p>{data.sellingDeliveryFees}</p>
-                            </div>
-                            <div>
-                                <Label>Commission (€)</Label>
-                                <p>{data.sellingCommission}</p>
-                            </div>
-                            <div>
-                                <Label>Frais Paypal (€)</Label>
-                                <p>{data.paypalFees}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                    {activeTab === "vente" && (
+                        <TabsContent value="vente" asChild>
+                            <motion.div
+                                key="vente"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.25 }}
+                            >
+                                <Card className="mt-4">
+                                    <CardHeader><CardTitle>Informations de vente</CardTitle></CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderField("Prix CD&LP (€)", "cdlpListingPrice")}
+                                        {renderField("Statut CD&LP", "cdlpListingStatus")}
+                                        {renderField("Prix Discogs (€)", "discogsSellingPrice")}
+                                        {renderField("Statut Discogs", "discogsSellingStatus")}
+                                        {renderField("Statut Ebay", "ebayListingStatus")}
+                                        {renderField("Lieu de vente", "sellingPlace")}
+                                        {renderField("Date de vente", "sellingDate")}
+                                        {renderField("Prix de vente (€)", "netSellingPrice")}
+                                        {renderField("Frais de vente (€)", "sellingDeliveryFees")}
+                                        {renderField("Commission (€)", "sellingCommission")}
+                                        {renderField("Frais Paypal (€)", "paypalFees")}
+                                        {renderField("Frais Ebay (€)", "iebayFees")}
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        </TabsContent>
+                    )}
 
-                <TabsContent value="listing">
-                    <Card className="mt-4">
-                        <CardHeader>
-                            <CardTitle>Informations listing</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <Label>Statut CD&LP</Label>
-                                <p>{data.cdlpListingStatus}</p>
-                            </div>
-                            <div>
-                                <Label>Statut Discogs</Label>
-                                <p>{data.discogsSellingStatus}</p>
-                            </div>
-                            <div>
-                                <Label>Statut Ebay</Label>
-                                <p>{data.ebayListingStatus}</p>
-                            </div>
-                            <div className="col-span-2">
-                                <Label>Notes / Problèmes</Label>
-                                <p>{data.listingIssues}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                    {activeTab === "listing" && (
+                        <TabsContent value="listing" asChild>
+                            <motion.div
+                                key="listing"
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.25 }}
+                            >
+                                <Card className="mt-4">
+                                    <CardHeader><CardTitle>Informations listing</CardTitle></CardHeader>
+                                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {renderField("Statut de paiement", "paymentStatus")}
+                                        {renderField("Statut de livraison", "deliveryStatus")}
+                                        {renderField("Réception", "isReceived")}
+                                        {renderField("Scan", "scanStatus")}
+                                        {renderField("Notes / Problèmes", "listingIssues", true)}
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        </TabsContent>
+                    )}
+                </AnimatePresence>
             </Tabs>
         </div>
     );
