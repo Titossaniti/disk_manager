@@ -20,6 +20,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { VinyleTablePagination } from "@/components/vinyle-table-pagination";
 import { useTableFiltersValues } from "@/hooks/table-filters-values";
 
+import { useRouter } from "next/navigation";
+
 const fetchVinyles = async (params: any) => {
     const queryParams = new URLSearchParams();
 
@@ -72,6 +74,7 @@ const defaultFilters = {
 };
 
 const LiteVinylesTable = () => {
+    const router = useRouter();
     const { data: filtersInit, isLoading: isLoadingFiltersInit } = useTableFiltersValues();
     const [filters, setFilters] = useState({ ...defaultFilters });
     const [appliedFilters, setAppliedFilters] = useState({ ...defaultFilters });
@@ -155,7 +158,7 @@ const LiteVinylesTable = () => {
                     Mise à jour...
                 </div>
             )}
-            
+
             <VinyleTablePagination
                 pagination={pagination}
                 page={page}
@@ -209,7 +212,15 @@ const LiteVinylesTable = () => {
 
                     <TableBody>
                         {rows.map((disk: any) => (
-                            <TableRow key={disk.id}>
+                            <TableRow
+                                key={disk.id}
+                                onClick={() => {
+                                    const artistUrl = encodeURIComponent(disk.artist.replace(/\s+/g, "-").replace(/["']/g, ""));
+                                    const titleUrl = encodeURIComponent(disk.title.replace(/\s+/g, "-").replace(/["']/g, ""));
+                                    router.push(`/detail/${disk.id}-${artistUrl}-${titleUrl}`);
+                                }}
+                                className="cursor-pointer hover:bg-muted"
+                            >
                                 <TableCell>{disk.support}</TableCell>
                                 <TableCell>{disk.artist}</TableCell>
                                 <TableCell className="max-w-[300px] truncate">
@@ -224,7 +235,6 @@ const LiteVinylesTable = () => {
                                         </Tooltip>
                                     </TooltipProvider>
                                 </TableCell>
-
                                 <TableCell>{disk.countryYear}</TableCell>
                                 <TableCell>{disk.diskCondition}</TableCell>
                                 <TableCell>{disk.scanStatus}</TableCell>
