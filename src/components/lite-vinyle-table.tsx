@@ -15,6 +15,18 @@ import {
     TableRow
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+    Pagination,
+    PaginationContent,
+    PaginationEllipsis,
+    PaginationItem,
+    PaginationLink,
+    PaginationNext,
+    PaginationPrevious,
+} from "@/components/ui/pagination";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+
+import { VinyleTablePagination } from "@/components/vinyle-table-pagination";
 
 const fetchVinyles = async (params: any) => {
     const queryParams = new URLSearchParams();
@@ -106,6 +118,7 @@ const LiteVinylesTable = () => {
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-10 w-full" />
             </div>
         );
     }
@@ -117,7 +130,7 @@ const LiteVinylesTable = () => {
     const pagination = data.pagination;
 
     return (
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-6">
             <VinyleFiltersForm
                 filters={filters}
                 onChange={handleChange}
@@ -128,79 +141,59 @@ const LiteVinylesTable = () => {
                 <Button variant="outline" onClick={resetFilters}>Réinitialiser</Button>
                 <Button onClick={applyFilters}>Appliquer les filtres</Button>
             </div>
+            <VinyleTablePagination
+                pagination={pagination}
+                page={page}
+                setPage={setPage}
+                size={size}
+                setSize={setSize}
+            />
 
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Support</TableHead>
-                        <TableHead>Artiste</TableHead>
-                        <TableHead>Titre</TableHead>
-                        <TableHead>Pays/Année</TableHead>
-                        <TableHead>État</TableHead>
-                        <TableHead>Scan</TableHead>
-                        <TableHead>Prix (€)</TableHead>
-                        <TableHead>Frais</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Réf</TableHead>
-                        <TableHead>Vente (€)</TableHead>
-                        <TableHead>Marge (€)</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {rows.map((disk: any) => (
-                        <TableRow key={disk.id}>
-                            <TableCell>{disk.id}</TableCell>
-                            <TableCell>{disk.support}</TableCell>
-                            <TableCell>{disk.artist}</TableCell>
-                            <TableCell>{disk.title}</TableCell>
-                            <TableCell>{disk.countryYear}</TableCell>
-                            <TableCell>{disk.diskCondition}</TableCell>
-                            <TableCell>{disk.scanStatus}</TableCell>
-                            <TableCell>{disk.netBuyPrice}</TableCell>
-                            <TableCell>{disk.buyDeliveryFees}</TableCell>
-                            <TableCell>{disk.sellingStatus}</TableCell>
-                            <TableCell>{disk.ref}</TableCell>
-                            <TableCell>{disk.netSellingPrice ?? "-"}</TableCell>
-                            <TableCell>{disk.margin ?? "-"}</TableCell>
+            <div className="rounded-md border">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Support</TableHead>
+                            <TableHead>Artiste</TableHead>
+                            <TableHead>Titre</TableHead>
+                            <TableHead>Pressage</TableHead>
+                            <TableHead>État</TableHead>
+                            <TableHead>Scan</TableHead>
+                            <TableHead>Frais</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Réf</TableHead>
+                            <TableHead>Prix</TableHead>
+                            <TableHead>Vente</TableHead>
+                            <TableHead>Marge</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-
-            <div className="flex justify-between items-center pt-2">
-                <Button
-                    disabled={pagination.first}
-                    onClick={() => setPage((p) => Math.max(p - 1, 0))}
-                    size="sm"
-                >
-                    Précédent
-                </Button>
-                <div className="flex items-center gap-2 text-sm">
-                    Page {pagination.page + 1} / {pagination.totalPages}
-                    <select
-                        value={size}
-                        onChange={(e) => {
-                            setSize(Number(e.target.value));
-                            setPage(0);
-                        }}
-                        className="select select-sm"
-                    >
-                        {[50, 100, 150, 200].map((val) => (
-                            <option key={val} value={val}>
-                                {val}
-                            </option>
+                    </TableHeader>
+                    <TableBody>
+                        {rows.map((disk: any) => (
+                            <TableRow key={disk.id}>
+                                <TableCell>{disk.support}</TableCell>
+                                <TableCell>{disk.artist}</TableCell>
+                                <TableCell>{disk.title}</TableCell>
+                                <TableCell>{disk.countryYear}</TableCell>
+                                <TableCell>{disk.diskCondition}</TableCell>
+                                <TableCell>{disk.scanStatus}</TableCell>
+                                <TableCell>{disk.buyDeliveryFees}</TableCell>
+                                <TableCell>{disk.sellingStatus}</TableCell>
+                                <TableCell>{disk.ref}</TableCell>
+                                <TableCell>{disk.netBuyPrice}</TableCell>
+                                <TableCell>{disk.netSellingPrice ?? "-"}</TableCell>
+                                <TableCell>{disk.margin ?? "-"}</TableCell>
+                            </TableRow>
                         ))}
-                    </select>
-                </div>
-                <Button
-                    disabled={pagination.last}
-                    onClick={() => setPage((p) => p + 1)}
-                    size="sm"
-                >
-                    Suivant
-                </Button>
+                    </TableBody>
+                </Table>
             </div>
+            <VinyleTablePagination
+                pagination={pagination}
+                page={page}
+                setPage={setPage}
+                size={size}
+                setSize={setSize}
+            />
         </div>
     );
 };
