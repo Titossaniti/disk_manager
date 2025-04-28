@@ -15,6 +15,7 @@ interface VinyleTablePaginationProps {
     pagination: {
         page: number;
         totalPages: number;
+        totalElements: number;
         first: boolean;
         last: boolean;
     };
@@ -31,8 +32,20 @@ export function VinyleTablePagination({
                                           size,
                                           setSize,
                                       }: VinyleTablePaginationProps) {
+    if (pagination.totalElements === 0) {
+        return (
+            <div className="text-center text-sm text-muted-foreground py-8">
+                Aucun résultat trouvé.
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col items-center justify-between gap-4 pt-4 md:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 pt-4 md:flex-row w-full">
+            <div className="text-sm text-muted-foreground whitespace-nowrap">
+                {pagination.totalElements.toLocaleString("fr-FR")}{" "}{pagination.totalElements === 1 ? "résultat" : "résultats"}
+            </div>
+
             <Pagination>
                 <PaginationContent className="flex items-center gap-2">
                     <PaginationItem>
@@ -44,7 +57,7 @@ export function VinyleTablePagination({
                         />
                     </PaginationItem>
 
-                    {Array.from({ length: pagination.totalPages }, (_, index) => {
+                    {Array.from({length: pagination.totalPages}, (_, index) => {
                         if (
                             index === 0 ||
                             index === pagination.totalPages - 1 ||
@@ -68,7 +81,7 @@ export function VinyleTablePagination({
                         ) {
                             return (
                                 <PaginationItem key={index}>
-                                    <PaginationEllipsis />
+                                    <PaginationEllipsis/>
                                 </PaginationItem>
                             );
                         }
@@ -95,9 +108,9 @@ export function VinyleTablePagination({
                     }}
                 >
                     <SelectTrigger className="w-full cursor-pointer">
-                        <SelectValue placeholder="Taille" />
+                        <SelectValue placeholder="Taille"/>
                     </SelectTrigger>
-                    <SelectContent >
+                    <SelectContent>
                         {[50, 100, 150, 200].map((val) => (
                             <SelectItem key={val} value={val.toString()} className="cursor-pointer">
                                 {val}

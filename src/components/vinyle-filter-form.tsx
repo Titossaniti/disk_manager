@@ -9,9 +9,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
 
-const supports = ["33", "33m", "45"];
-const sellingStatuses = ["vendu", "en vente", "pas encore en vente"];
-
 const sliderFields = [
     { name: "netBuyPrice", label: "Prix achat (€)" },
     { name: "netSellingPrice", label: "Prix vente (€)" },
@@ -22,11 +19,18 @@ export const VinyleFiltersForm = ({
                                       filters,
                                       onChange,
                                       onDateChange,
+                                      filtersInit,
                                   }: {
     filters: any;
     onChange: (name: string, value: any) => void;
     onDateChange: (name: string, date: Date | null) => void;
+    filtersInit: any;
 }) => {
+
+    const supports = filtersInit.supports ?? [];
+    const sellingStatuses = filtersInit.sellingStatuses ?? [];
+    const diskConditions = filtersInit.diskConditions ?? [];
+
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 rounded-lg shadow p-4 bg-muted">
             <div>
@@ -38,7 +42,7 @@ export const VinyleFiltersForm = ({
                         checked={filters.matchExactArtist}
                         onCheckedChange={(checked) => onChange("matchExactArtist", checked)}
                     />
-                    <Label htmlFor="matchExactArtist" className="text-sm">Match exact</Label>
+                    <Label htmlFor="matchExactArtist" className="text-sm">Rechercher uniquement ce titre exact</Label>
                 </div>
             </div>
 
@@ -51,7 +55,7 @@ export const VinyleFiltersForm = ({
                         checked={filters.matchExactTitle}
                         onCheckedChange={(checked) => onChange("matchExactTitle", checked)}
                     />
-                    <Label htmlFor="matchExactTitle" className="text-sm">Match exact</Label>
+                    <Label htmlFor="matchExactTitle" className="text-sm">Rechercher uniquement ce titre exact</Label>
                 </div>
             </div>
 
@@ -130,17 +134,17 @@ export const VinyleFiltersForm = ({
                                 type="number"
                                 step="0.01"
                                 className="w-24"
-                                value={filters[`${name}Min`] ?? ""}
+                                value={filters[`${name}Min`] ?? filtersInit[`${name}Min`] ?? ""}
                                 onChange={(e) => onChange(`${name}Min`, e.target.value === "" ? null : parseFloat(e.target.value))}
                                 placeholder="Min"
                             />
                             <Slider
                                 value={[
-                                    filters[`${name}Min`] ?? 0,
-                                    filters[`${name}Max`] ?? 1500,
+                                    filters[`${name}Min`] ?? filtersInit[`${name}Min`] ?? 0,
+                                    filters[`${name}Max`] ?? filtersInit[`${name}Max`] ?? 1500,
                                 ]}
-                                min={0}
-                                max={1500}
+                                min={filtersInit[`${name}Min`] ?? 0}
+                                max={filtersInit[`${name}Max`] ?? 1500}
                                 step={1}
                                 onValueChange={([min, max]) => {
                                     onChange(`${name}Min`, min);
@@ -151,7 +155,7 @@ export const VinyleFiltersForm = ({
                                 type="number"
                                 step="0.01"
                                 className="w-24"
-                                value={filters[`${name}Max`] ?? ""}
+                                value={filters[`${name}Max`] ?? filtersInit[`${name}Max`] ?? ""}
                                 onChange={(e) => onChange(`${name}Max`, e.target.value === "" ? null : parseFloat(e.target.value))}
                                 placeholder="Max"
                             />

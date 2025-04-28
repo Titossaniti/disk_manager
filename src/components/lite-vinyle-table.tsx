@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { VinyleTablePagination } from "@/components/vinyle-table-pagination";
+import { useTableFiltersValues } from "@/hooks/table-filters-values";
 
 const fetchVinyles = async (params: any) => {
     const queryParams = new URLSearchParams();
@@ -71,6 +72,7 @@ const defaultFilters = {
 };
 
 const LiteVinylesTable = () => {
+    const { data: filtersInit, isLoading: isLoadingFiltersInit } = useTableFiltersValues();
     const [filters, setFilters] = useState({ ...defaultFilters });
     const [appliedFilters, setAppliedFilters] = useState({ ...defaultFilters });
 
@@ -80,7 +82,7 @@ const LiteVinylesTable = () => {
     const [sortBy, setSortBy] = useState<string | null>(null);
     const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
 
-    const { data, isLoading, isError } = useQuery({
+    const { data, isLoading, isError, isFetching } = useQuery({
         queryKey: ["vinyles", { ...appliedFilters, page, size, sortBy, sortDirection }],
         queryFn: () => fetchVinyles({ ...appliedFilters, page, size, sortBy, sortDirection }),
         keepPreviousData: true,
@@ -128,9 +130,8 @@ const LiteVinylesTable = () => {
             </div>
         );
     }
-
     if (isError) return <div className="p-4 text-red-600">Erreur lors du chargement.</div>;
-    if (!data) return null;
+    if (!data || !filtersInit) return null;
 
     const rows = data.content;
     const pagination = data.pagination;
@@ -141,12 +142,20 @@ const LiteVinylesTable = () => {
                 filters={filters}
                 onChange={handleChange}
                 onDateChange={handleDateChange}
+                filtersInit={filtersInit}
             />
 
             <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={resetFilters}>Réinitialiser</Button>
                 <Button onClick={applyFilters}>Appliquer les filtres</Button>
             </div>
+
+            {isFetching && (
+                <div className="text-center text-sm text-muted-foreground animate-pulse">
+                    Mise à jour...
+                </div>
+            )}
+            
             <VinyleTablePagination
                 pagination={pagination}
                 page={page}
