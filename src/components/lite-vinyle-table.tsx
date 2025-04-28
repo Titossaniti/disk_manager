@@ -15,16 +15,7 @@ import {
     TableRow
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-    Pagination,
-    PaginationContent,
-    PaginationEllipsis,
-    PaginationItem,
-    PaginationLink,
-    PaginationNext,
-    PaginationPrevious,
-} from "@/components/ui/pagination";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 import { VinyleTablePagination } from "@/components/vinyle-table-pagination";
 
@@ -33,8 +24,8 @@ const fetchVinyles = async (params: any) => {
 
     queryParams.append("page", params.page);
     queryParams.append("size", params.size);
-    queryParams.append("sortBy", "artist");
-    queryParams.append("direction", "asc");
+    if (params.sortBy) queryParams.append("sortBy", params.sortBy);
+    if (params.sortDirection) queryParams.append("direction", params.sortDirection);
 
     if (params.artist) queryParams.append("artist", params.artist);
     if (params.matchExactArtist) queryParams.append("matchExact", "true");
@@ -86,11 +77,26 @@ const LiteVinylesTable = () => {
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(50);
 
+    const [sortBy, setSortBy] = useState<string | null>(null);
+    const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
+
     const { data, isLoading, isError } = useQuery({
-        queryKey: ["vinyles", { ...appliedFilters, page, size }],
-        queryFn: () => fetchVinyles({ ...appliedFilters, page, size }),
+        queryKey: ["vinyles", { ...appliedFilters, page, size, sortBy, sortDirection }],
+        queryFn: () => fetchVinyles({ ...appliedFilters, page, size, sortBy, sortDirection }),
         keepPreviousData: true,
     });
+
+    const handleSort = (column: string) => {
+        if (sortBy !== column) {
+            setSortBy(column);
+            setSortDirection('asc');
+        } else if (sortDirection === 'asc') {
+            setSortDirection('desc');
+        } else if (sortDirection === 'desc') {
+            setSortBy(null);
+            setSortDirection(null);
+        }
+    };
 
     const handleChange = (name: string, value: any) => {
         setFilters((prev) => ({ ...prev, [name]: value }));
@@ -153,26 +159,63 @@ const LiteVinylesTable = () => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Support</TableHead>
-                            <TableHead>Artiste</TableHead>
-                            <TableHead>Titre</TableHead>
-                            <TableHead>Pressage</TableHead>
-                            <TableHead>État</TableHead>
-                            <TableHead>Scan</TableHead>
-                            <TableHead>Frais</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Réf</TableHead>
-                            <TableHead>Prix</TableHead>
-                            <TableHead>Vente</TableHead>
-                            <TableHead>Marge</TableHead>
+                            <TableHead onClick={() => handleSort('support')} className="cursor-pointer select-none">
+                                Support {sortBy === 'support' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('artist')} className="cursor-pointer select-none">
+                                Artiste {sortBy === 'artist' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('title')} className="cursor-pointer select-none">
+                                Titre {sortBy === 'title' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('countryYear')} className="cursor-pointer select-none">
+                                Pressage {sortBy === 'countryYear' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('diskCondition')} className="cursor-pointer select-none">
+                                État {sortBy === 'diskCondition' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('scanStatus')} className="cursor-pointer select-none">
+                                Scan {sortBy === 'scanStatus' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('buyDeliveryFees')} className="cursor-pointer select-none">
+                                Frais {sortBy === 'buyDeliveryFees' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('sellingStatus')} className="cursor-pointer select-none">
+                                Status {sortBy === 'sellingStatus' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('ref')} className="cursor-pointer select-none">
+                                Réf {sortBy === 'ref' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('netBuyPrice')} className="cursor-pointer select-none">
+                                Prix {sortBy === 'netBuyPrice' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('netSellingPrice')} className="cursor-pointer select-none">
+                                Vente {sortBy === 'netSellingPrice' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort('margin')} className="cursor-pointer select-none">
+                                Marge {sortBy === 'margin' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
+
                     <TableBody>
                         {rows.map((disk: any) => (
                             <TableRow key={disk.id}>
                                 <TableCell>{disk.support}</TableCell>
                                 <TableCell>{disk.artist}</TableCell>
-                                <TableCell>{disk.title}</TableCell>
+                                <TableCell className="max-w-[300px] truncate">
+                                    <TooltipProvider delayDuration={100}>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <span>{disk.title}</span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                {disk.title}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </TableCell>
+
                                 <TableCell>{disk.countryYear}</TableCell>
                                 <TableCell>{disk.diskCondition}</TableCell>
                                 <TableCell>{disk.scanStatus}</TableCell>

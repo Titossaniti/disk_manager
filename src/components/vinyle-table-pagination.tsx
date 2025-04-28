@@ -38,7 +38,9 @@ export function VinyleTablePagination({
                     <PaginationItem>
                         <PaginationPrevious
                             onClick={() => setPage(Math.max(page - 1, 0))}
-                            className={pagination.first ? "pointer-events-none opacity-50" : ""}
+                            className={`${
+                                pagination.first ? "pointer-events-none opacity-50" : "cursor-pointer"
+                            }`}
                         />
                     </PaginationItem>
 
@@ -53,6 +55,7 @@ export function VinyleTablePagination({
                                     <PaginationLink
                                         isActive={index === pagination.page}
                                         onClick={() => setPage(index)}
+                                        className="cursor-pointer"
                                     >
                                         {index + 1}
                                     </PaginationLink>
@@ -75,7 +78,9 @@ export function VinyleTablePagination({
                     <PaginationItem>
                         <PaginationNext
                             onClick={() => setPage(page + 1)}
-                            className={pagination.last ? "pointer-events-none opacity-50" : ""}
+                            className={`${
+                                pagination.last ? "pointer-events-none opacity-50" : "cursor-pointer"
+                            }`}
                         />
                     </PaginationItem>
                 </PaginationContent>
@@ -89,12 +94,12 @@ export function VinyleTablePagination({
                         setPage(0);
                     }}
                 >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full cursor-pointer">
                         <SelectValue placeholder="Taille" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent >
                         {[50, 100, 150, 200].map((val) => (
-                            <SelectItem key={val} value={val.toString()}>
+                            <SelectItem key={val} value={val.toString()} className="cursor-pointer">
                                 {val}
                             </SelectItem>
                         ))}
