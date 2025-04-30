@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -21,13 +21,112 @@ import {
     SelectItem,
 } from "@/components/ui";
 import { Spinner } from "@/components/ui/spinner";
+import { Euro } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
-const requiredFields = ["artist", "title", "support", "countryYear", "buyPlace", "netBuyPrice", "buyDate", "sellingStatus"];
+const vinyleSchema = z.object({
+    artist: z.string().min(1, "Champ requis"),
+    title: z.string().min(1, "Champ requis"),
+    support: z.string().min(1, "Champ requis"),
+    countryYear: z.string().min(1, "Champ requis"),
+    buyPlace: z.string().min(1, "Champ requis"),
+    netBuyPrice: z.coerce.number().nonnegative("Doit être positif"),
+    buyDate: z.string().min(1, "Champ requis"),
+    sellingStatus: z.string().min(1, "Champ requis"),
+    diskCondition: z.string().min(1, "Champ requis"),
+    label: z.string().optional(),
+    genre: z.string().optional(),
+    notes: z.string().optional(),
+    sellingPlace: z.string().optional(),
+    sellingDate: z.string().optional(),
+    netSellingPrice: z.coerce.number().optional(),
+    buyDeliveryFees: z.coerce.number().optional(),
+    sellingDeliveryFees: z.coerce.number().optional(),
+    sellingCommission: z.coerce.number().optional(),
+    paypalFees: z.coerce.number().optional(),
+    iebayFees: z.coerce.number().optional(),
+    paymentStatus: z.string().optional(),
+    deliveryStatus: z.string().optional(),
+    isReceived: z.string().optional(),
+    scanStatus: z.string().optional(),
+    ref: z.string().optional(),
+    cdlpListingPrice: z.coerce.number().optional(),
+    cdlpListingStatus: z.string().optional(),
+    discogsSellingPrice: z.coerce.number().optional(),
+    discogsSellingStatus: z.string().optional(),
+    listingIssues: z.string().optional(),
+    ebayListingStatus: z.string().optional(),
+});
 
-export default function AddVinylePage() {
+type VinyleFormData = z.infer<typeof vinyleSchema>;
+
+const requiredFields: (keyof VinyleFormData)[] = [
+    "artist",
+    "title",
+    "support",
+    "countryYear",
+    "buyPlace",
+    "netBuyPrice",
+    "buyDate",
+    "sellingStatus",
+    "diskCondition",
+];
+
+const orderedFields: (keyof VinyleFormData)[] = [
+    "artist",
+    "title",
+    "support",
+    "genre",
+    "label",
+    "countryYear",
+    "ref",
+    "diskCondition",
+    "scanStatus",
+    "notes",
+    "buyDate",
+    "buyPlace",
+    "netBuyPrice",
+    "buyDeliveryFees",
+    "sellingStatus",
+    "sellingPlace",
+    "sellingDate",
+    "netSellingPrice",
+    "sellingDeliveryFees",
+    "sellingCommission",
+    "paypalFees",
+    "iebayFees",
+    "paymentStatus",
+    "deliveryStatus",
+    "isReceived",
+    "cdlpListingPrice",
+    "cdlpListingStatus",
+    "discogsSellingPrice",
+    "discogsSellingStatus",
+    "ebayListingStatus",
+    "listingIssues",
+];
+
+export default function AddVinyleForm() {
     const router = useRouter();
     const queryClient = useQueryClient();
     const firstInvalidField = useRef<HTMLInputElement | null>(null);
+
+    const form = useForm<VinyleFormData>({
+        resolver: zodResolver(vinyleSchema),
+        defaultValues: Object.fromEntries(
+            orderedFields.map((field) => [field, ""])
+        ) as any,
+    });
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors, isSubmitting },
+    } = form;
 
     const { data: filtersInit, isLoading: isLoadingFilters } = useQuery({
         queryKey: ["vinyles", "filters", "initialization"],
@@ -37,97 +136,25 @@ export default function AddVinylePage() {
         },
     });
 
-    const initialForm = {
-        artist: "",
-        title: "",
-        support: "",
-        countryYear: "",
-        label: "",
-        genre: "",
-        diskCondition: "",
-        notes: "",
-        sellingStatus: "",
-        buyPlace: "",
-        buyDate: "",
-        netBuyPrice: "",
-        buyDeliveryFees: "",
-        sellingPlace: "",
-        sellingDate: "",
-        netSellingPrice: "",
-        sellingDeliveryFees: "",
-        sellingCommission: "",
-        paypalFees: "",
-        iebayFees: "",
-        paymentStatus: "",
-        deliveryStatus: "",
-        isReceived: "",
-        scanStatus: "",
-        ref: "",
-        cdlpListingPrice: "",
-        cdlpListingStatus: "",
-        discogsSellingPrice: "",
-        discogsSellingStatus: "",
-        listingIssues: "",
-        ebayListingStatus: "",
-    };
-
-    const [formData, setFormData] = useState(initialForm);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
     const createVinyle = useMutation({
-        mutationFn: async (newDisk: any) => {
-            setIsSubmitting(true);
+        mutationFn: async (newDisk: VinyleFormData) => {
             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/vinyles`, newDisk, { withCredentials: true });
             return data;
         },
         onSuccess: (createdDisk) => {
             queryClient.invalidateQueries({ queryKey: ["vinyles"] });
             toast.success("Disque ajouté avec succès !");
-            setFormData(initialForm);
             const formattedArtist = createdDisk.artist.replaceAll(" ", "-").replaceAll("/", "-").replaceAll("\\", "-");
             const formattedTitle = createdDisk.title.replaceAll(" ", "-").replaceAll("/", "-").replaceAll("\\", "-");
             router.push(`/detail/${createdDisk.id}-${formattedArtist}-${formattedTitle}`);
         },
         onError: (error: any) => {
-            if (error.response?.data?.message) {
-                toast.error(`Erreur lors de la création : ${error.response.data.message}`);
-            } else {
-                toast.error("Erreur inconnue lors de la création du disque.");
-            }
+            toast.error(error.response?.data?.message || "Erreur inconnue lors de la création du disque.");
         },
-        onSettled: () => {
-            setIsSubmitting(false);
-        }
     });
 
-    const handleChange = (name: string, value: any) => {
-        setFormData((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const isFormValid = requiredFields.every((field) => formData[field]) &&
-        Number(formData.netBuyPrice) >= 0 &&
-        formData.buyDate && new Date(formData.buyDate) <= new Date();
-
-    const handleCreate = () => {
-        if (!isFormValid) {
-            if (firstInvalidField.current) firstInvalidField.current.focus();
-            // if (firstInvalidField.current) if ("focus" in firstInvalidField.current) {
-            //     firstInvalidField.current.focus();
-            // }
-            toast.error("Veuillez corriger les erreurs dans le formulaire.");
-            return;
-        }
-
-        const finalForm = { ...formData };
-        Object.keys(finalForm).forEach(key => {
-            if (key.includes("Price") || key.includes("Fees") || key.includes("Commission")) {
-                if (finalForm[key] === "") {
-                    finalForm[key] = 0;
-                }
-            }
-        });
-
-        createVinyle.mutate(finalForm);
+    const onSubmit = (values: VinyleFormData) => {
+        createVinyle.mutate(values);
     };
 
     if (isLoadingFilters || !filtersInit) {
@@ -141,29 +168,60 @@ export default function AddVinylePage() {
     }
 
     return (
-        <div className="p-6 space-y-6">
+        <form onSubmit={handleSubmit(onSubmit, () => {
+            toast.error("Veuillez corriger les erreurs dans le formulaire.");
+        })} className="p-6 space-y-6">
             <div className="space-y-1">
                 <h1 className="text-2xl font-bold tracking-tight">Ajouter un nouveau disque</h1>
                 <p className="text-muted-foreground">Complétez les champs du formulaire et validez pour ajouter votre disque à la base de données !</p>
             </div>
             <Card>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {Object.entries(initialForm).map(([key, _]) => (
+                    {orderedFields.map((key) => (
                         <div key={key} className="flex flex-col gap-1">
                             <Label className="flex items-center gap-1">
                                 {requiredFields.includes(key) && <span className="text-red-500">*</span>}
-                                {key === "artist" ? "Artiste" :
-                                    key === "title" ? "Titre" :
-                                        key === "support" ? "Support" :
-                                            key === "countryYear" ? "Pressage" :
-                                                key === "buyPlace" ? "Lieu d'achat" :
-                                                    key === "netBuyPrice" ? "Prix d'achat (€)" :
-                                                        key === "buyDate" ? "Date d'achat" :
-                                                            key === "sellingStatus" ? "Statut de vente" :
-                                                                key.charAt(0).toUpperCase() + key.slice(1)}
+                                {key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? (
+                                    <>
+                                        {key === "netBuyPrice" && "Prix d'achat"}
+                                        {key === "buyDeliveryFees" && "Frais de livraison d'achat"}
+                                        {key === "netSellingPrice" && "Prix de vente"}
+                                        {key === "sellingCommission" && "Commission du site de vente"}
+                                        {key === "paypalFees" && "Frais Paypal"}
+                                        {key === "iebayFees" && "Frais ieBay"}
+                                        {key === "sellingDeliveryFees" && "Frais de livraison de vente"}
+                                        {key === "cdlpListingPrice" && "Prix CD&LP"}
+                                        {key === "discogsSellingPrice" && "Prix Discogs"} <Euro className="w-4 h-4 text-muted-foreground" />
+                                    </>
+                                ) : (
+                                    {
+                                        artist: "Artiste",
+                                        title: "Titre",
+                                        support: "Support",
+                                        genre: "Genre",
+                                        label: "Label",
+                                        countryYear: "Pressage",
+                                        ref: "Référence du disque",
+                                        diskCondition: "État du disque",
+                                        scanStatus: "État du scan",
+                                        notes: "Notes",
+                                        buyDate: "Date d'achat",
+                                        buyPlace: "Lieu d'achat",
+                                        sellingStatus: "Statut de vente",
+                                        sellingPlace: "Lieu de vente",
+                                        sellingDate: "Date de vente",
+                                        paymentStatus: "Statut du paiement",
+                                        deliveryStatus: "État de la livraison",
+                                        isReceived: "État de la réception",
+                                        cdlpListingStatus: "Statut de l'annonce CD&LP",
+                                        discogsSellingStatus: "Statut de l'annonce Discogs",
+                                        ebayListingStatus: "Statut de l'annonce eBay",
+                                        listingIssues: "Problèmes rencontrés",
+                                    }[key] || key
+                                )}
                             </Label>
                             {key === "support" ? (
-                                <Select value={formData.support} onValueChange={(v) => handleChange("support", v)}>
+                                <Select value={watch("support")} onValueChange={(v) => setValue("support", v)}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Choisir..." />
                                     </SelectTrigger>
@@ -174,44 +232,41 @@ export default function AddVinylePage() {
                                     </SelectContent>
                                 </Select>
                             ) : key === "sellingStatus" ? (
-                                <Select value={formData.sellingStatus} onValueChange={(v) => handleChange("sellingStatus", v)}>
+                                <Select value={watch("sellingStatus")} onValueChange={(v) => setValue("sellingStatus", v)}>
                                     <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Choisir..." />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {filtersInit["sellingStatuses"].map((s: string) => (
+                                        {filtersInit.sellingStatuses.map((s: string) => (
                                             <SelectItem key={s} value={s}>{s}</SelectItem>
                                         ))}
                                     </SelectContent>
                                 </Select>
-                            ) : key.includes("notes") || key.includes("issues") ? (
-                                <Textarea
-                                    value={formData[key]}
-                                    onChange={(e) => handleChange(key, e.target.value)}
-                                />
+                            ) : key === "notes" || key === "listingIssues" ? (
+                                <Textarea {...register(key)} />
                             ) : (
                                 <Input
                                     type={key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? "number" : key.includes("Date") ? "date" : "text"}
-                                    value={formData[key] ?? ""}
-                                    onChange={(e) => handleChange(key, e.target.value)}
                                     min={key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? 0 : undefined}
+                                    {...register(key)}
                                 />
                             )}
+                            {errors[key] && <p className="text-sm text-red-500">{errors[key]?.message as string}</p>}
                         </div>
                     ))}
                 </CardContent>
                 <div className="flex justify-end p-4">
                     <motion.div
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: isFormValid ? 1 : 0.5 }}
+                        animate={{ opacity: 1 }}
                         transition={{ duration: 0.3 }}
                     >
-                        <Button onClick={handleCreate} disabled={!isFormValid || isSubmitting}>
+                        <Button type="submit" disabled={isSubmitting}>
                             {isSubmitting ? <Spinner /> : "Créer le disque"}
                         </Button>
                     </motion.div>
                 </div>
             </Card>
-        </div>
+        </form>
     );
 }
