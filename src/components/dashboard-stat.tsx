@@ -23,7 +23,6 @@ export default function DashboardStat() {
     const [lastMonthStats, setLastMonthStats] = useState<Stats | null>(null)
     const [showNumbers, setShowNumbers] = useState(true)
 
-    // Number with spaces
     const formatNumber = (value: number | string | null, unit?: string) => {
         if (value == null) return "-"
         const number = typeof value === "string" ? parseFloat(value) : value
@@ -109,7 +108,8 @@ export default function DashboardStat() {
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-end">
+            <div className="flex justify-between items-center">
+                <h2 className={"text-muted-foreground text-xl"} >Statistiques générales</h2>
                 <Button variant="outline" className="hover:cursor-pointer" size="sm" onClick={() => setShowNumbers(!showNumbers)}>
                     {showNumbers ? "Masquer les chiffres" : "Afficher les chiffres"}
                 </Button>

@@ -95,7 +95,8 @@ export const VinyleFormFields = ({ register, errors, watch, setValue, filtersIni
                         <Textarea {...register(key)} />
                     ) : (
                         <Input
-                            type={key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? "number" : key.includes("Date") ? "date" : "text"}
+                            type="text"
+                            inputMode={key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? "decimal" : undefined}
                             min={key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? 0 : undefined}
                             {...register(key)}
                         />
