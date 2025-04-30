@@ -5,6 +5,15 @@ import {ReactNode} from "react";
 
 const inter = Inter({ subsets: ["latin"] })
 
+export const metadata = {
+    title: 'Disk Manager',
+    manifest: '/site.webmanifest',
+    icons: {
+        icon: '/favicon.ico',
+        apple: '/apple-touch-icon.png'
+    }
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
     return (
         <html lang="fr" suppressHydrationWarning>

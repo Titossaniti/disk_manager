@@ -133,8 +133,8 @@ export default function DetailPage() {
                 ← Retour aux disques
             </Button>
 
-            <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">
+            <div className="flex justify-between items-center pt-4">
+                <h1 className="text-3xl font-bold">
                     {watch("artist")} - {watch("title")}
                 </h1>
                 <div className="flex gap-2">
