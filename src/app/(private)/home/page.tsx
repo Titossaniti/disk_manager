@@ -1,9 +1,8 @@
 "use client"
 
 import DashboardStat from "@/components/dashboard-stat";
-import {Button, Separator} from "@/components/ui";
-import {Plus} from "lucide-react";
-import {redirect} from "next/navigation";
+import {Separator} from "@/components/ui";
+import DashboardCards from "@/components/dashboard-cards";
 
 export default function DashboardPage() {
 
@@ -16,16 +15,7 @@ export default function DashboardPage() {
             <Separator/>
             <DashboardStat />
             <Separator/>
-            <p>2 CARDS - SEE VINYLES & ADD NEW</p>
-            <Button
-                onClick={() => {
-                    redirect("/create");
-                }}
-                className="rounded-full h-12 w-12 p-0 cursor-pointer border border-2 hover:bg-gray-400"
-                variant="icon"
-            >
-                <Plus className="h-6 w-6" />
-            </Button>
+            <DashboardCards />
         </div>
     )
 }

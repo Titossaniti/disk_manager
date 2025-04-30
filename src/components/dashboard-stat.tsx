@@ -109,7 +109,7 @@ export default function DashboardStat() {
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                <h2 className={"text-muted-foreground text-xl"} >Statistiques générales</h2>
+                <h2 className="text-muted-foreground text-xl" >Statistiques générales</h2>
                 <Button variant="outline" className="hover:cursor-pointer" size="sm" onClick={() => setShowNumbers(!showNumbers)}>
                     {showNumbers ? "Masquer les chiffres" : "Afficher les chiffres"}
                 </Button>
