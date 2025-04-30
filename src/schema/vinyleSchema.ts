@@ -4,7 +4,11 @@ const dateFormat = /^\d{4}-\d{2}-\d{2}$/;
 
 const flexibleNumber = () =>
     z.preprocess(
-        (val) => typeof val === "string" ? parseFloat(val.replace(",", ".")) : val,
+        (val) => {
+            if (val === "" || val === null || val === undefined) return 0;
+            if (typeof val === "string") return parseFloat(val.replace(",", "."));
+            return val;
+        },
         z.number().nonnegative("Doit être positif")
     );
 
@@ -32,20 +36,20 @@ export const vinyleSchema = z.object({
             z.null()
         ])
         .optional().nullable(),
-    netSellingPrice: flexibleNumber().nullable().optional(),
-    buyDeliveryFees: flexibleNumber().nullable().optional(),
-    sellingDeliveryFees: flexibleNumber().nullable().optional(),
-    sellingCommission: flexibleNumber().nullable().optional(),
-    paypalFees: flexibleNumber().nullable().optional(),
-    iebayFees: flexibleNumber().nullable().optional(),
+    netSellingPrice: flexibleNumber(),
+    buyDeliveryFees: flexibleNumber(),
+    sellingDeliveryFees: flexibleNumber(),
+    sellingCommission: flexibleNumber(),
+    paypalFees: flexibleNumber(),
+    iebayFees: flexibleNumber(),
     paymentStatus: z.string().nullable().optional(),
     deliveryStatus: z.string().nullable().optional(),
     isReceived: z.string().nullable().optional(),
     scanStatus: z.string().nullable().optional(),
     ref: z.string().nullable().optional(),
-    cdlpListingPrice: flexibleNumber().nullable().optional(),
+    cdlpListingPrice: flexibleNumber(),
     cdlpListingStatus: z.string().nullable().optional(),
-    discogsSellingPrice: flexibleNumber().nullable().optional(),
+    discogsSellingPrice: flexibleNumber(),
     discogsSellingStatus: z.string().nullable().optional(),
     listingIssues: z.string().nullable().optional(),
     ebayListingStatus: z.string().nullable().optional(),
@@ -58,7 +62,54 @@ export const vinyleSchema = z.object({
         message: "La date de vente ne peut pas être antérieure à la date d'achat.",
         path: ["sellingDate"],
     }
-);
+).superRefine((data, ctx) => {
+    const isVendu = data.sellingStatus === "vendu";
+    const isPasEnVente = data.sellingStatus === "pas encore en vente" || data.sellingStatus === "en vente";
+
+    if (isVendu) {
+        if (!data.sellingDate || data.sellingDate === "") {
+            ctx.addIssue({
+                path: ["sellingDate"],
+                code: z.ZodIssueCode.custom,
+                message: "La date de vente est requise si le disque est indiqué comme vendu.",
+            });
+        }
+
+        if (data.netSellingPrice == null || isNaN(data.netSellingPrice)) {
+            ctx.addIssue({
+                path: ["netSellingPrice"],
+                code: z.ZodIssueCode.custom,
+                message: "Le prix de vente est requis si le disque est indiqué comme vendu.",
+            });
+        }
+    }
+
+    if (isPasEnVente) {
+        if (data.sellingDate && data.sellingDate !== "") {
+            ctx.addIssue({
+                path: ["sellingDate"],
+                code: z.ZodIssueCode.custom,
+                message: "La date de vente ne doit pas être remplie si le disque n'est pas encore vendu.",
+            });
+        }
+
+        if (data.netSellingPrice > 0) {
+            ctx.addIssue({
+                path: ["netSellingPrice"],
+                code: z.ZodIssueCode.custom,
+                message: "Le prix de vente ne doit pas être rempli si le disque n'est pas encore vendu.",
+            });
+        }
+
+        if (data.sellingPlace && data.sellingPlace !== "") {
+            ctx.addIssue({
+                path: ["sellingPlace"],
+                code: z.ZodIssueCode.custom,
+                message: "Le lieu de vente ne doit pas être rempli si le disque n'est pas encore vendu.",
+            });
+        }
+    }
+});
 
 export type VinyleFormData = z.infer<typeof vinyleSchema>;
 
