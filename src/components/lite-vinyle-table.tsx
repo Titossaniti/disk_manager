@@ -294,10 +294,10 @@ const LiteVinylesTable = () => {
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <div className="truncate">{disk.artist}</div>
+                                                <div className="truncate">{disk.artist?.toUpperCase()}</div>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <span>{disk.artist}</span>
+                                                <span>{disk.artist?.toUpperCase()}</span>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
@@ -306,17 +306,17 @@ const LiteVinylesTable = () => {
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <div className="truncate">{disk.title}</div>
+                                                <div className="truncate">{disk.title?.toUpperCase()}</div>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <span>{disk.title}</span>
+                                                <span>{disk.title?.toUpperCase()}</span>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </TableCell>
                                 <TableCell>
                                     <Badge className={sellingStatusBadgeColor(disk.sellingStatus)}>
-                                        {disk.sellingStatus}
+                                        {disk.sellingStatus?.toUpperCase()}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>
@@ -324,12 +324,12 @@ const LiteVinylesTable = () => {
                                         <Tooltip>
                                             <TooltipTrigger asChild>
                                                 <div className="truncate">
-                                                    {disk.label ? disk.label : <CircleSlash size={16} color="#90A1B9" />}
+                                                    {disk.label?.toUpperCase() ? disk.label?.toUpperCase() : <CircleSlash size={16} color="#90A1B9" />}
                                                 </div>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 {disk.label ? (
-                                                    <span>{disk.label}</span>
+                                                    <span>{disk.label?.toUpperCase()}</span>
                                                 ) : (
                                                     <div className="flex items-center gap-1">
                                                         <CircleSlash size={16} color="#90A1B9" />
@@ -339,17 +339,17 @@ const LiteVinylesTable = () => {
                                         </Tooltip>
                                     </TooltipProvider>
                                 </TableCell>
-                                <TableCell>{disk.ref}</TableCell>
-                                <TableCell>{disk.countryYear}</TableCell>
-                                <TableCell>{disk.diskCondition}</TableCell>
-                                <TableCell>{renderScanStatus(disk.scanStatus)}</TableCell>
+                                <TableCell>{disk.ref?.toUpperCase()}</TableCell>
+                                <TableCell>{disk.countryYear?.toUpperCase()}</TableCell>
+                                <TableCell>{disk.diskCondition?.toUpperCase()}</TableCell>
+                                <TableCell>{renderScanStatus(disk.scanStatus?.toUpperCase())}</TableCell>
                                 <TableCell>{disk.netBuyPrice}</TableCell>
                                 <TableCell>{disk.netSellingPrice != null ? disk.netSellingPrice : <CircleSlash size={16} color={"#90A1B9"}/>}</TableCell>
                                 <TableCell>{disk.margin != null ? disk.margin : <CircleSlash size={16}/>}</TableCell>
                                 <TableCell>{format(new Date(disk.buyDate), "dd/MM/yyyy")}</TableCell>
                                 <TableCell>{disk.sellingDate ? format(new Date(disk.sellingDate), "dd/MM/yyyy") : <CircleSlash size={16} color="#90A1B9" />}</TableCell>
-                                <TableCell>{disk.buyPlace}</TableCell>
-                                <TableCell>{disk.sellingPlace ? disk.sellingPlace : <CircleSlash size={16} color="#90A1B9"/>}</TableCell>
+                                <TableCell>{disk.buyPlace?.toUpperCase()}</TableCell>
+                                <TableCell>{disk.sellingPlace?.toUpperCase() ? disk.sellingPlace?.toUpperCase() : <CircleSlash size={16} color="#90A1B9"/>}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
