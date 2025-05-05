@@ -8,7 +8,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
-import {MultiSelect} from "@/components/ui/multi-select";
+import MultipleSelector from "@/components/ui/multiple-selector";
 
 const sliderFields = [
     { name: "netBuyPrice", label: "Prix achat (€)" },
@@ -36,7 +36,7 @@ export const VinyleFiltersForm = ({
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 rounded-lg shadow p-4 bg-muted">
             <div>
                 <Label htmlFor="artist">Artiste</Label>
-                <Input id="artist" value={filters.artist} onChange={(e) => onChange("artist", e.target.value)} />
+                <Input id="artist" value={filters.artist} onChange={(e) => onChange("artist", e.target.value)}/>
                 <div className="flex items-center gap-2 mt-1">
                     <Checkbox
                         id="matchExactArtist"
@@ -49,7 +49,7 @@ export const VinyleFiltersForm = ({
 
             <div>
                 <Label htmlFor="title">Titre</Label>
-                <Input id="title" value={filters.title} onChange={(e) => onChange("title", e.target.value)} />
+                <Input id="title" value={filters.title} onChange={(e) => onChange("title", e.target.value)}/>
                 <div className="flex items-center gap-2 mt-1">
                     <Checkbox
                         id="matchExactTitle"
@@ -62,7 +62,8 @@ export const VinyleFiltersForm = ({
 
             <div>
                 <Label htmlFor="countryYear">Pressage</Label>
-                <Input id="countryYear" value={filters.countryYear} onChange={(e) => onChange("countryYear", e.target.value)} />
+                <Input id="countryYear" value={filters.countryYear}
+                       onChange={(e) => onChange("countryYear", e.target.value)}/>
             </div>
 
             <div>
@@ -72,7 +73,7 @@ export const VinyleFiltersForm = ({
                     onValueChange={(v) => onChange("support", v === "__ALL__" ? "" : v)}
                 >
                     <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Tous" />
+                        <SelectValue placeholder="Tous"/>
                     </SelectTrigger>
                     <SelectContent>
                         <SelectItem value="__ALL__">Tous</SelectItem>
@@ -85,19 +86,22 @@ export const VinyleFiltersForm = ({
 
             <div>
                 <Label htmlFor="diskCondition">État disque</Label>
-                <Input id="diskCondition" value={filters.diskCondition} onChange={(e) => onChange("diskCondition", e.target.value)} />
+                <Input id="diskCondition" value={filters.diskCondition}
+                       onChange={(e) => onChange("diskCondition", e.target.value)}/>
             </div>
 
             <div>
-                <Label>Statuts</Label>
-                <MultiSelect
+                <Label>Statuts de vente</Label>
+                <MultipleSelector
                     options={sellingStatuses.map((status) => ({
+                        key: status,
                         label: status,
                         value: status,
                     }))}
-                    defaultValue={filters.sellingStatus}
-                    onValueChange={(values) => onChange("sellingStatus", values)}
-                    placeholder="Tous"
+                    value={filters.sellingStatus.map((v: string) => ({ label: v, value: v }))}
+                    onChange={(values) => onChange("sellingStatus", values.map(v => v.value))}
+                    placeholder={filters.sellingStatus.length === 0 ? "Tous" : ""}
+                    hidePlaceholderWhenSelected
                 />
             </div>
 
@@ -108,7 +112,8 @@ export const VinyleFiltersForm = ({
 
             <div>
                 <Label htmlFor="sellingPlace">Lieu de vente</Label>
-                <Input id="sellingPlace" value={filters.sellingPlace} onChange={(e) => onChange("sellingPlace", e.target.value)} />
+                <Input id="sellingPlace" value={filters.sellingPlace}
+                       onChange={(e) => onChange("sellingPlace", e.target.value)}/>
             </div>
 
             <div>
@@ -133,10 +138,10 @@ export const VinyleFiltersForm = ({
 
             <div>
                 <Label htmlFor="label">Label</Label>
-                <Input id="label" value={filters.label} onChange={(e) => onChange("label", e.target.value)} />
+                <Input id="label" value={filters.label} onChange={(e) => onChange("label", e.target.value)}/>
             </div>
 
-            {sliderFields.map(({ name, label }) => (
+            {sliderFields.map(({name, label}) => (
                 <div key={name} className="col-span-1 md:col-span-2 space-y-2">
                     <Label>{label}</Label>
                     <div className="flex flex-col gap-1">
