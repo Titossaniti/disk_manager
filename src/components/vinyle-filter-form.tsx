@@ -72,7 +72,7 @@ export const VinyleFiltersForm = ({
                     value={filters.support || "__ALL__"}
                     onValueChange={(v) => onChange("support", v === "__ALL__" ? "" : v)}
                 >
-                    <SelectTrigger className="w-full">
+                    <SelectTrigger className="w-full cursor-pointer">
                         <SelectValue placeholder="Tous"/>
                     </SelectTrigger>
                     <SelectContent>
@@ -90,7 +90,7 @@ export const VinyleFiltersForm = ({
                        onChange={(e) => onChange("diskCondition", e.target.value)}/>
             </div>
 
-            <div>
+            <div className={"relative"}>
                 <Label>Statuts de vente</Label>
                 <MultipleSelector
                     options={sellingStatuses.map((status) => ({
@@ -102,6 +102,7 @@ export const VinyleFiltersForm = ({
                     onChange={(values) => onChange("sellingStatus", values.map(v => v.value))}
                     placeholder={filters.sellingStatus.length === 0 ? "Tous" : ""}
                     hidePlaceholderWhenSelected
+                    className="bg-input/30 hover:bg-input/50 hover:cursor-pointer h-[36px]"
                 />
             </div>
 

@@ -439,10 +439,11 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                             return (
                                 <Badge
                                     key={option.value}
-                                    variant="secondary"
+                                    variant="outline"
                                     className={cn(
                                         'data-[disabled]:bg-muted-foreground data-[disabled]:text-muted data-[disabled]:hover:bg-muted-foreground',
                                         'data-[fixed]:bg-muted-foreground data-[fixed]:text-muted data-[fixed]:hover:bg-muted-foreground',
+                                        'py-1',
                                         badgeClassName,
                                     )}
                                     data-fixed={option.fixed}
@@ -493,7 +494,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 }}
                                 placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
                                 className={cn(
-                                    'flex-1 bg-transparent outline-none placeholder:text-muted-foreground text-sm',
+                                    'flex-1 bg-transparent outline-none placeholder:text-[#F5F7F9] text-sm',
                                     {
                                         'w-full': hidePlaceholderWhenSelected,
                                         'px-0': selected.length !== 0,
