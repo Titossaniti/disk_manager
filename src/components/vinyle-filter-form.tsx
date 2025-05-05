@@ -29,12 +29,12 @@ export const VinyleFiltersForm = ({
 }) => {
     const supports = filtersInit.supports ?? [];
     const sellingStatuses = filtersInit.sellingStatuses ?? [];
-    const diskConditions = filtersInit.diskConditions ?? [];
-    const labels = filtersInit.labels ?? [];
+    // const diskConditions = filtersInit.diskConditions ?? [];
+    // const labels = filtersInit.labels ?? [];
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 rounded-lg shadow p-4 bg-muted">
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="artist">Artiste</Label>
                 <Input id="artist" value={filters.artist} onChange={(e) => onChange("artist", e.target.value)}/>
                 <div className="flex items-center gap-2 mt-1">
@@ -47,7 +47,7 @@ export const VinyleFiltersForm = ({
                 </div>
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="title">Titre</Label>
                 <Input id="title" value={filters.title} onChange={(e) => onChange("title", e.target.value)}/>
                 <div className="flex items-center gap-2 mt-1">
@@ -60,13 +60,13 @@ export const VinyleFiltersForm = ({
                 </div>
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="countryYear">Pressage</Label>
                 <Input id="countryYear" value={filters.countryYear}
                        onChange={(e) => onChange("countryYear", e.target.value)}/>
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label>Support</Label>
                 <Select
                     value={filters.support || "__ALL__"}
@@ -84,13 +84,13 @@ export const VinyleFiltersForm = ({
                 </Select>
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="diskCondition">État disque</Label>
                 <Input id="diskCondition" value={filters.diskCondition}
                        onChange={(e) => onChange("diskCondition", e.target.value)}/>
             </div>
 
-            <div className={"relative"}>
+            <div className={"relative space-y-1"} >
                 <Label>Statuts de vente</Label>
                 <MultipleSelector
                     options={sellingStatuses.map((status) => ({
@@ -106,18 +106,18 @@ export const VinyleFiltersForm = ({
                 />
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="buyPlace">Lieu d'achat</Label>
                 <Input id="buyPlace" value={filters.buyPlace} onChange={(e) => onChange("buyPlace", e.target.value)}/>
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="sellingPlace">Lieu de vente</Label>
                 <Input id="sellingPlace" value={filters.sellingPlace}
                        onChange={(e) => onChange("sellingPlace", e.target.value)}/>
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="sellingDateFrom">Vendu après</Label>
                 <Input
                     type="date"
@@ -127,7 +127,7 @@ export const VinyleFiltersForm = ({
                 />
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="sellingDateTo">Vendu avant</Label>
                 <Input
                     type="date"
@@ -137,7 +137,7 @@ export const VinyleFiltersForm = ({
                 />
             </div>
 
-            <div>
+            <div className="space-y-1">
                 <Label htmlFor="label">Label</Label>
                 <Input id="label" value={filters.label} onChange={(e) => onChange("label", e.target.value)}/>
             </div>
@@ -149,10 +149,19 @@ export const VinyleFiltersForm = ({
                         <div className="flex items-center gap-2">
                             <Input
                                 type="number"
-                                step="0.01"
-                                className="w-24"
-                                value={filters[`${name}Min`] ?? filtersInit[`${name}Min`] ?? ""}
-                                onChange={(e) => onChange(`${name}Min`, e.target.value === "" ? null : parseFloat(e.target.value))}
+                                step="1"
+                                className="w-28"
+                                value={filters[`${name}Min`] !== null && filters[`${name}Min`] !== undefined
+                                    ? filters[`${name}Min`]
+                                    : ""}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value === "") {
+                                        onChange(`${name}Min`, null);
+                                    } else if (/^\d*\.?\d*$/.test(value)) {
+                                        onChange(`${name}Min`, value);
+                                    }
+                                }}
                                 placeholder="Min"
                             />
                             <Slider
@@ -170,12 +179,22 @@ export const VinyleFiltersForm = ({
                             />
                             <Input
                                 type="number"
-                                step="0.01"
-                                className="w-24"
-                                value={filters[`${name}Max`] ?? filtersInit[`${name}Max`] ?? ""}
-                                onChange={(e) => onChange(`${name}Max`, e.target.value === "" ? null : parseFloat(e.target.value))}
+                                step="1"
+                                className="w-28"
+                                value={filters[`${name}Max`] !== null && filters[`${name}Max`] !== undefined
+                                    ? filters[`${name}Max`]
+                                    : ""}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (value === "") {
+                                        onChange(`${name}Max`, null);
+                                    } else if (/^\d*\.?\d*$/.test(value)) {
+                                        onChange(`${name}Max`, value);
+                                    }
+                                }}
                                 placeholder="Max"
                             />
+
                         </div>
                     </div>
                 </div>

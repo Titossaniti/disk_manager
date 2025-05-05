@@ -245,7 +245,10 @@ const LiteVinylesTable = () => {
                             <TableHead onClick={() => handleSort("diskCondition")} className="cursor-pointer">
                                 État {sortBy === 'diskCondition' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead>Scan</TableHead>
+                            <TableHead onClick={() => handleSort("scanStatus")} className="cursor-pointer">
+                                Scan {sortBy === 'scanStatus' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+
                             <TableHead onClick={() => handleSort("netBuyPrice")} className="cursor-pointer">
                                 <div className="flex items-center gap-1">
                                     Achat <Euro size={14}/> {sortBy === 'netBuyPrice' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
@@ -287,7 +290,18 @@ const LiteVinylesTable = () => {
                                 className="cursor-pointer hover:bg-muted"
                             >
                                 <TableCell>{disk.support}</TableCell>
-                                <TableCell>{disk.artist}</TableCell>
+                                <TableCell className="max-w-[120px]">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="truncate">{disk.artist}</div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <span>{disk.artist}</span>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </TableCell>
                                 <TableCell className="max-w-[180px]">
                                     <TooltipProvider>
                                         <Tooltip>
@@ -305,7 +319,26 @@ const LiteVinylesTable = () => {
                                         {disk.sellingStatus}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>{disk.label ? disk.label : <CircleSlash size={16} color={"#90A1B9"}/>}</TableCell>
+                                <TableCell>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="truncate">
+                                                    {disk.label ? disk.label : <CircleSlash size={16} color="#90A1B9" />}
+                                                </div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                {disk.label ? (
+                                                    <span>{disk.label}</span>
+                                                ) : (
+                                                    <div className="flex items-center gap-1">
+                                                        <CircleSlash size={16} color="#90A1B9" />
+                                                    </div>
+                                                )}
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </TableCell>
                                 <TableCell>{disk.ref}</TableCell>
                                 <TableCell>{disk.countryYear}</TableCell>
                                 <TableCell>{disk.diskCondition}</TableCell>
