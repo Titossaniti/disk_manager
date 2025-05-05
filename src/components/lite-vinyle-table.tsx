@@ -31,15 +31,24 @@ const fetchVinyles = async (params: any) => {
     if (params.sortDirection) queryParams.append("direction", params.sortDirection);
 
     if (params.artist) queryParams.append("artist", params.artist);
-    if (params.matchExactArtist) queryParams.append("matchExact", "true");
+    if (params.matchExactArtist) queryParams.append("matchExactArtist", "true");
     if (params.title) queryParams.append("title", params.title);
     if (params.matchExactTitle) queryParams.append("matchExactTitle", "true");
     if (params.countryYear) queryParams.append("countryYear", params.countryYear);
     if (params.support) queryParams.append("support", params.support);
     if (params.diskCondition) queryParams.append("diskCondition", params.diskCondition);
-    if (params.sellingStatus) queryParams.append("sellingStatus", params.sellingStatus);
+    if (params.sellingStatus?.length) {
+        for (const status of params.sellingStatus) {
+            queryParams.append("sellingStatuses", status);
+        }
+    }
+    if (params.buyPlace) queryParams.append("buyPlace", params.buyPlace);
+    if (params.sellingPlace) queryParams.append("sellingPlace", params.sellingPlace);
+    if (params.label) queryParams.append("label", params.label);
     if (params.buyDateFrom) queryParams.append("buyDateFrom", format(params.buyDateFrom, "yyyy-MM-dd"));
     if (params.buyDateTo) queryParams.append("buyDateTo", format(params.buyDateTo, "yyyy-MM-dd"));
+    if (params.sellingDateFrom) queryParams.append("sellingDateFrom", format(params.sellingDateFrom, "yyyy-MM-dd"));
+    if (params.sellingDateTo) queryParams.append("sellingDateTo", format(params.sellingDateTo, "yyyy-MM-dd"));
     if (params.netBuyPriceMin !== null) queryParams.append("netBuyPriceMin", params.netBuyPriceMin.toString());
     if (params.netBuyPriceMax !== null) queryParams.append("netBuyPriceMax", params.netBuyPriceMax.toString());
     if (params.netSellingPriceMin !== null) queryParams.append("netSellingPriceMin", params.netSellingPriceMin.toString());
@@ -62,9 +71,14 @@ const defaultFilters = {
     countryYear: "",
     support: "",
     diskCondition: "",
-    sellingStatus: "",
+    sellingStatus: [],
+    buyPlace: "",
+    sellingPlace: "",
+    label: "",
     buyDateFrom: null as Date | null,
     buyDateTo: null as Date | null,
+    sellingDateFrom: null as Date | null,
+    sellingDateTo: null as Date | null,
     netBuyPriceMin: null as number | null,
     netBuyPriceMax: null as number | null,
     netSellingPriceMin: null as number | null,
@@ -171,45 +185,25 @@ const LiteVinylesTable = () => {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead onClick={() => handleSort('support')} className="cursor-pointer select-none">
-                                Support {sortBy === 'support' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('artist')} className="cursor-pointer select-none">
-                                Artiste {sortBy === 'artist' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('title')} className="cursor-pointer select-none">
-                                Titre {sortBy === 'title' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('countryYear')} className="cursor-pointer select-none">
-                                Pressage {sortBy === 'countryYear' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('diskCondition')} className="cursor-pointer select-none">
-                                État {sortBy === 'diskCondition' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('scanStatus')} className="cursor-pointer select-none">
-                                Scan {sortBy === 'scanStatus' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('buyDeliveryFees')} className="cursor-pointer select-none">
-                                Frais {sortBy === 'buyDeliveryFees' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('sellingStatus')} className="cursor-pointer select-none">
-                                Status {sortBy === 'sellingStatus' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('ref')} className="cursor-pointer select-none">
-                                Réf {sortBy === 'ref' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('netBuyPrice')} className="cursor-pointer select-none">
-                                Prix {sortBy === 'netBuyPrice' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('netSellingPrice')} className="cursor-pointer select-none">
-                                Vente {sortBy === 'netSellingPrice' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
-                            <TableHead onClick={() => handleSort('margin')} className="cursor-pointer select-none">
-                                Marge {sortBy === 'margin' && (sortDirection === 'asc' ? ' ↑' : sortDirection === 'desc' ? ' ↓' : '')}
-                            </TableHead>
+                            <TableHead>Support</TableHead>
+                            <TableHead>Artiste</TableHead>
+                            <TableHead>Titre</TableHead>
+                            <TableHead>Pressage</TableHead>
+                            <TableHead>État</TableHead>
+                            <TableHead>Scan</TableHead>
+                            <TableHead>Frais</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Réf</TableHead>
+                            <TableHead>Prix</TableHead>
+                            <TableHead>Vente</TableHead>
+                            <TableHead>Marge</TableHead>
+                            <TableHead>Label</TableHead>
+                            <TableHead>Acheté le</TableHead>
+                            <TableHead>Vendu le</TableHead>
+                            <TableHead>Lieu achat</TableHead>
+                            <TableHead>Lieu vente</TableHead>
                         </TableRow>
                     </TableHeader>
-
                     <TableBody>
                         {rows.map((disk: any) => (
                             <TableRow
@@ -223,18 +217,7 @@ const LiteVinylesTable = () => {
                             >
                                 <TableCell>{disk.support}</TableCell>
                                 <TableCell>{disk.artist}</TableCell>
-                                <TableCell className="max-w-[300px] truncate">
-                                    <TooltipProvider delayDuration={100}>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <span>{disk.title}</span>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                {disk.title}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
-                                </TableCell>
+                                <TableCell>{disk.title}</TableCell>
                                 <TableCell>{disk.countryYear}</TableCell>
                                 <TableCell>{disk.diskCondition}</TableCell>
                                 <TableCell>{disk.scanStatus}</TableCell>
@@ -244,11 +227,17 @@ const LiteVinylesTable = () => {
                                 <TableCell>{disk.netBuyPrice}</TableCell>
                                 <TableCell>{disk.netSellingPrice ?? "-"}</TableCell>
                                 <TableCell>{disk.margin ?? "-"}</TableCell>
+                                <TableCell>{disk.label ?? "-"}</TableCell>
+                                <TableCell>{disk.buyDate ? format(new Date(disk.buyDate), "dd/MM/yyyy") : "-"}</TableCell>
+                                <TableCell>{disk.sellingDate ? format(new Date(disk.sellingDate), "dd/MM/yyyy") : "-"}</TableCell>
+                                <TableCell>{disk.buyPlace ?? "-"}</TableCell>
+                                <TableCell>{disk.sellingPlace ?? "-"}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </div>
+
             <VinyleTablePagination
                 pagination={pagination}
                 page={page}

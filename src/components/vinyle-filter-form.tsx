@@ -3,11 +3,12 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Select, SelectTrigger, SelectValue, SelectContent, SelectItem
+    Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { format } from "date-fns";
+import {MultiSelect} from "@/components/ui/multi-select";
 
 const sliderFields = [
     { name: "netBuyPrice", label: "Prix achat (€)" },
@@ -26,10 +27,10 @@ export const VinyleFiltersForm = ({
     onDateChange: (name: string, date: Date | null) => void;
     filtersInit: any;
 }) => {
-
     const supports = filtersInit.supports ?? [];
     const sellingStatuses = filtersInit.sellingStatuses ?? [];
     const diskConditions = filtersInit.diskConditions ?? [];
+    const labels = filtersInit.labels ?? [];
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 rounded-lg shadow p-4 bg-muted">
@@ -88,41 +89,51 @@ export const VinyleFiltersForm = ({
             </div>
 
             <div>
-                <Label>Statut</Label>
-                <Select
-                    value={filters.sellingStatus || "__ALL__"}
-                    onValueChange={(v) => onChange("sellingStatus", v === "__ALL__" ? "" : v)}
-                >
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Tous" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="__ALL__">Tous</SelectItem>
-                        {sellingStatuses.map((s) => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-            </div>
-
-            <div>
-                <Label htmlFor="buyDateFrom">Acheté après</Label>
-                <Input
-                    type="date"
-                    id="buyDateFrom"
-                    value={filters.buyDateFrom ? format(filters.buyDateFrom, "yyyy-MM-dd") : ""}
-                    onChange={(e) => onDateChange("buyDateFrom", e.target.value ? new Date(e.target.value) : null)}
+                <Label>Statuts</Label>
+                <MultiSelect
+                    options={sellingStatuses.map((status) => ({
+                        label: status,
+                        value: status,
+                    }))}
+                    defaultValue={filters.sellingStatus}
+                    onValueChange={(values) => onChange("sellingStatus", values)}
+                    placeholder="Tous"
                 />
             </div>
 
             <div>
-                <Label htmlFor="buyDateTo">Acheté avant</Label>
+                <Label htmlFor="buyPlace">Lieu d'achat</Label>
+                <Input id="buyPlace" value={filters.buyPlace} onChange={(e) => onChange("buyPlace", e.target.value)}/>
+            </div>
+
+            <div>
+                <Label htmlFor="sellingPlace">Lieu de vente</Label>
+                <Input id="sellingPlace" value={filters.sellingPlace} onChange={(e) => onChange("sellingPlace", e.target.value)} />
+            </div>
+
+            <div>
+                <Label htmlFor="sellingDateFrom">Vendu après</Label>
                 <Input
                     type="date"
-                    id="buyDateTo"
-                    value={filters.buyDateTo ? format(filters.buyDateTo, "yyyy-MM-dd") : ""}
-                    onChange={(e) => onDateChange("buyDateTo", e.target.value ? new Date(e.target.value) : null)}
+                    id="sellingDateFrom"
+                    value={filters.sellingDateFrom ? format(filters.sellingDateFrom, "yyyy-MM-dd") : ""}
+                    onChange={(e) => onDateChange("sellingDateFrom", e.target.value ? new Date(e.target.value) : null)}
                 />
+            </div>
+
+            <div>
+                <Label htmlFor="sellingDateTo">Vendu avant</Label>
+                <Input
+                    type="date"
+                    id="sellingDateTo"
+                    value={filters.sellingDateTo ? format(filters.sellingDateTo, "yyyy-MM-dd") : ""}
+                    onChange={(e) => onDateChange("sellingDateTo", e.target.value ? new Date(e.target.value) : null)}
+                />
+            </div>
+
+            <div>
+                <Label htmlFor="label">Label</Label>
+                <Input id="label" value={filters.label} onChange={(e) => onChange("label", e.target.value)} />
             </div>
 
             {sliderFields.map(({ name, label }) => (
