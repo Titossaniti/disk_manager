@@ -16,11 +16,13 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 import { VinyleTablePagination } from "@/components/vinyle-table-pagination";
 import { useTableFiltersValues } from "@/hooks/table-filters-values";
 
 import { useRouter } from "next/navigation";
+import {CircleCheckBig, CircleSlash, Euro} from "lucide-react";
 
 const fetchVinyles = async (params: any) => {
     const queryParams = new URLSearchParams();
@@ -153,6 +155,40 @@ const LiteVinylesTable = () => {
     const rows = data.content;
     const pagination = data.pagination;
 
+    const sellingStatusBadgeColor = (status: string) => {
+        switch (status) {
+            case "vendu":
+                return "bg-green-700 text-zinc";
+            case "en vente":
+                return "bg-emerald-900 text-zinc";
+            case "pas encore en vente":
+                return "bg-orange-400 text-zinc";
+            case "à mettre en vente":
+                return "bg-red-800 text-zinc";
+            default:
+                return "bg-muted text-zinc";
+        }
+    };
+
+    const renderScanStatus = (status: string | null | undefined) => {
+        if (!status || status.trim() === "") {
+            return <CircleSlash size={16} className={"text-destructive"} />;
+        }
+
+        if (status.toLowerCase() === "ok") {
+            return (
+                    <CircleCheckBig className={"text-green-700"} size={16} />
+            );
+        }
+
+        return (
+            <Badge className="bg-yellow-500 text-black">
+                {status}
+            </Badge>
+        );
+    };
+
+
     return (
         <div className="p-4 space-y-6">
             <VinyleFiltersForm
@@ -169,7 +205,7 @@ const LiteVinylesTable = () => {
 
             {isFetching && (
                 <div className="text-center text-sm text-muted-foreground animate-pulse">
-                    Mise à jour...
+                    Mise à jour du tableau en cours...
                 </div>
             )}
 
@@ -184,24 +220,59 @@ const LiteVinylesTable = () => {
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
-                        <TableRow>
-                            <TableHead>Support</TableHead>
-                            <TableHead>Artiste</TableHead>
-                            <TableHead>Titre</TableHead>
-                            <TableHead>Pressage</TableHead>
-                            <TableHead>État</TableHead>
+                        <TableRow className={"cursor-pointer"}>
+                            <TableHead onClick={() => handleSort("support")} className="cursor-pointer">
+                                Support {sortBy === 'support' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("artist")} className="cursor-pointer">
+                                Artiste {sortBy === 'artist' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("title")} className="cursor-pointer">
+                                Titre {sortBy === 'title' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("sellingStatus")} className="cursor-pointer">
+                                Status {sortBy === 'sellingStatus' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("label")} className="cursor-pointer">
+                                Label {sortBy === 'label' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("ref")} className="cursor-pointer">
+                                Réf {sortBy === 'ref' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("countryYear")} className="cursor-pointer">
+                                Pressage {sortBy === 'countryYear' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("diskCondition")} className="cursor-pointer">
+                                État {sortBy === 'diskCondition' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
                             <TableHead>Scan</TableHead>
-                            <TableHead>Frais</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Réf</TableHead>
-                            <TableHead>Prix</TableHead>
-                            <TableHead>Vente</TableHead>
-                            <TableHead>Marge</TableHead>
-                            <TableHead>Label</TableHead>
-                            <TableHead>Acheté le</TableHead>
-                            <TableHead>Vendu le</TableHead>
-                            <TableHead>Lieu achat</TableHead>
-                            <TableHead>Lieu vente</TableHead>
+                            <TableHead onClick={() => handleSort("netBuyPrice")} className="cursor-pointer">
+                                <div className="flex items-center gap-1">
+                                    Achat <Euro size={14}/> {sortBy === 'netBuyPrice' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                                </div>
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("netSellingPrice")} className="cursor-pointer">
+                                <div className="flex items-center gap-1">
+                                    Vente <Euro size={14}/> {sortBy === 'netSellingPrice' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                                </div>
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("margin")} className="cursor-pointer">
+                                <div className="flex items-center gap-1">
+                                    Marge <Euro size={14}/> {sortBy === 'margin' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                                </div>
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("buyDate")} className="cursor-pointer">
+                                Date achat {sortBy === 'buyDate' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("sellingDate")} className="cursor-pointer">
+                                Date vente {sortBy === 'sellingDate' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("buyPlace")} className="cursor-pointer">
+                                Lieu achat {sortBy === 'buyPlace' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
+                            <TableHead onClick={() => handleSort("sellingPlace")} className="cursor-pointer">
+                                Lieu vente {sortBy === 'sellingPlace' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -217,21 +288,35 @@ const LiteVinylesTable = () => {
                             >
                                 <TableCell>{disk.support}</TableCell>
                                 <TableCell>{disk.artist}</TableCell>
-                                <TableCell>{disk.title}</TableCell>
+                                <TableCell className="max-w-[180px]">
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <div className="truncate">{disk.title}</div>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <span>{disk.title}</span>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </TableCell>
+                                <TableCell>
+                                    <Badge className={sellingStatusBadgeColor(disk.sellingStatus)}>
+                                        {disk.sellingStatus}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>{disk.label ? disk.label : <CircleSlash size={16} color={"#90A1B9"}/>}</TableCell>
+                                <TableCell>{disk.ref}</TableCell>
                                 <TableCell>{disk.countryYear}</TableCell>
                                 <TableCell>{disk.diskCondition}</TableCell>
-                                <TableCell>{disk.scanStatus}</TableCell>
-                                <TableCell>{disk.buyDeliveryFees}</TableCell>
-                                <TableCell>{disk.sellingStatus}</TableCell>
-                                <TableCell>{disk.ref}</TableCell>
+                                <TableCell>{renderScanStatus(disk.scanStatus)}</TableCell>
                                 <TableCell>{disk.netBuyPrice}</TableCell>
-                                <TableCell>{disk.netSellingPrice ?? "-"}</TableCell>
-                                <TableCell>{disk.margin ?? "-"}</TableCell>
-                                <TableCell>{disk.label ?? "-"}</TableCell>
-                                <TableCell>{disk.buyDate ? format(new Date(disk.buyDate), "dd/MM/yyyy") : "-"}</TableCell>
-                                <TableCell>{disk.sellingDate ? format(new Date(disk.sellingDate), "dd/MM/yyyy") : "-"}</TableCell>
-                                <TableCell>{disk.buyPlace ?? "-"}</TableCell>
-                                <TableCell>{disk.sellingPlace ?? "-"}</TableCell>
+                                <TableCell>{disk.netSellingPrice != null ? disk.netSellingPrice : <CircleSlash size={16} color={"#90A1B9"}/>}</TableCell>
+                                <TableCell>{disk.margin != null ? disk.margin : <CircleSlash size={16}/>}</TableCell>
+                                <TableCell>{format(new Date(disk.buyDate), "dd/MM/yyyy")}</TableCell>
+                                <TableCell>{disk.sellingDate ? format(new Date(disk.sellingDate), "dd/MM/yyyy") : <CircleSlash size={16} color="#90A1B9" />}</TableCell>
+                                <TableCell>{disk.buyPlace}</TableCell>
+                                <TableCell>{disk.sellingPlace ? disk.sellingPlace : <CircleSlash size={16} color="#90A1B9"/>}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
