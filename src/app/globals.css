@@ -128,3 +128,15 @@
     @apply bg-background text-foreground;
   }
 }
+
+[data-slot="sidebar"] {
+  transition: transform 0.3s ease;
+}
+
+[data-state="collapsed"][data-slot="sidebar"] {
+  transform: translateX(-100%);
+}
+
+[data-slot="sidebar-trigger"] {
+  transition: background-color 0.2s ease;
+}

@@ -47,8 +47,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         }
 
-        // Appelle /me uniquement sur les pages privées
-        if (pathname.startsWith("/dashboard")) {
+        // fetchUser() est appelé uniquement si l'utilisateur n'est pas sur la page de login
+        if (!pathname.startsWith("/login")) {
             fetchUser()
         } else {
             setIsLoading(false)

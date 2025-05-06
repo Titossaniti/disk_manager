@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
-import {ChartNoAxesColumn} from 'lucide-react'
+import {ChartColumn} from 'lucide-react'
 import Link from "next/link";
 
 type Stats = {
@@ -130,7 +130,7 @@ export default function DashboardStat() {
                     <CardContent>
                         <Link href="/statistics">
                             <Button variant="default" className="w-full cursor-pointer">
-                                <ChartNoAxesColumn className="mr-2 h-5 w-5" />
+                                <ChartColumn className="mr-2 h-5 w-5" />
                                 Accéder aux statistiques
                             </Button>
                         </Link>

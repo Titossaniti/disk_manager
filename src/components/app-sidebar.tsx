@@ -1,15 +1,13 @@
 "use client"
 
 import Link from "next/link"
-import {LayoutDashboard, LogOut, Disc3, ChartNoAxesColumn, DiscAlbum} from "lucide-react"
-
+import {LayoutDashboard, LogOut, Disc3, DiscAlbum, FilePlus, ChartColumn} from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
     SidebarMenu,
-    SidebarMenuButton,
     SidebarMenuItem,
     SidebarSeparator,
 } from "@/components/ui/sidebar"
@@ -19,7 +17,7 @@ import { useAuth } from "@/hooks/useAuth"
 
 export function AppSidebar() {
     const { user, isLoading, logout } = useAuth()
-
+    console.log("AppSidebar mounted", { user, isLoading });
     if (isLoading) return null
     if (!user) return null
 
@@ -31,7 +29,7 @@ export function AppSidebar() {
         },
         {
             title: "Statistiques",
-            icon: ChartNoAxesColumn,
+            icon: ChartColumn,
             href: "/statistics",
         },
         {
@@ -39,10 +37,15 @@ export function AppSidebar() {
             icon: Disc3,
             href: "/vinyles",
         },
+        {
+            title: "Ajouter un disque",
+            icon: FilePlus,
+            href: "/create",
+        },
     ]
 
     return (
-        <Sidebar>
+        <Sidebar side="left" variant="sidebar" collapsible="offcanvas">
             <SidebarHeader>
                 <div className="flex items-center gap-2 px-4 py-2">
                     <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
@@ -55,16 +58,14 @@ export function AppSidebar() {
                 </div>
             </SidebarHeader>
             <SidebarSeparator />
-            <SidebarContent >
+            <SidebarContent>
                 <SidebarMenu className="p-3">
                     {navItems.map((item) => (
                         <SidebarMenuItem key={item.href}>
-                            <SidebarMenuButton asChild>
-                                <Link href={item.href}>
-                                    <item.icon className="h-4 w-4" />
-                                    <span>{item.title}</span>
-                                </Link>
-                            </SidebarMenuButton>
+                            <Link href={item.href} className="flex items-center gap-2 p-2 hover:bg-accent rounded-md">
+                                <item.icon className="h-4 w-4" />
+                                <span>{item.title}</span>
+                            </Link>
                         </SidebarMenuItem>
                     ))}
                 </SidebarMenu>
@@ -82,9 +83,9 @@ export function AppSidebar() {
                             <span className="text-xs text-muted-foreground">{user.email}</span>
                         </div>
                     </div>
-                    <Button variant="destructive" className="hover:border-2 hover:border-red-400 hover:cursor-pointer" size="icon" onClick={logout}>
+                    <Button variant="destructive" size="icon" onClick={logout}>
                         <LogOut className="h-4 w-4" />
-                        <span className="sr-only">Logout</span>
+                        <span className="sr-only">Déconnexion</span>
                     </Button>
                 </div>
             </SidebarFooter>
