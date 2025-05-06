@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
+import {ChartNoAxesColumn} from 'lucide-react'
+import Link from "next/link";
 
 type Stats = {
     countInSale: number
@@ -118,9 +120,22 @@ export default function DashboardStat() {
                 <StatCard title="Vendus" value={currentStats?.countSold} />
                 <StatCard title="En vente" value={currentStats?.countInSale} />
                 <StatCard title="Pas encore en vente" value={lastMonthStats?.countNotInSale} />
-                <StatCard title="Marge totale" value={currentStats?.totalMargin} unit="€" />
                 <StatCard title="Vendus ce mois-ci" value={currentStats?.countSoldThisPeriod} />
                 <StatCard title="Vendus le mois dernier" value={lastMonthStats?.countSoldThisPeriod} />
+                <Card className="flex flex-col justify-between">
+                    <CardHeader>
+                        <CardTitle>Statistiques détaillées</CardTitle>
+                        <CardDescription>Voir l'ensemble des chiffres</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Link href="/statistics">
+                            <Button variant="default" className="w-full cursor-pointer">
+                                <ChartNoAxesColumn className="mr-2 h-5 w-5" />
+                                Accéder aux statistiques
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     )
