@@ -1,6 +1,5 @@
 "use client";
 
-
 import {useParams, useRouter, useSearchParams} from "next/navigation";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useEffect, useState} from "react";
@@ -30,9 +29,9 @@ import {
     TabsList,
     TabsTrigger
 } from "@/components/ui";
-import { Spinner } from "@/components/ui/spinner";
 import { vinyleSchema, VinyleFormData } from "@/schema/vinyleSchema";
 import { VinyleFormFields } from "@/components/vinyle-form-fields";
+import {Loader2} from "lucide-react";
 
 export default function DetailPage() {
     const params = useParams();
@@ -298,7 +297,7 @@ export default function DetailPage() {
                     </Card>
                     <div className="flex justify-end gap-4 px-4">
                         <Button type="submit" disabled={isSubmitting}>
-                            {isSubmitting ? <Spinner /> : "Enregistrer les modifications"}
+                            {isSubmitting ? <Loader2 /> : "Enregistrer les modifications"}
                         </Button>
                         <Dialog>
                             <DialogTrigger asChild>

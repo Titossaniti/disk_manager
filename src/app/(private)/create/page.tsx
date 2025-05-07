@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,16 +10,15 @@ import {
     Button,
     Card,
     CardContent, CardDescription, CardTitle,
-    Label,
     Skeleton,
 } from "@/components/ui";
-import { Spinner } from "@/components/ui/spinner";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {VinyleFormFields} from "@/components/vinyle-form-fields";
 import {orderedFields, vinyleSchema} from "@/schema/vinyleSchema";
 import {DiscogsSearch} from "@/components/discogs-search";
+import {Loader2} from "lucide-react";
 
 type VinyleFormData = z.infer<typeof vinyleSchema>;
 
@@ -154,7 +153,7 @@ export default function AddVinyleForm() {
                             transition={{duration: 0.3}}
                         >
                             <Button type="submit" disabled={isSubmitting}>
-                                {isSubmitting ? <Spinner/> : "Créer le disque"}
+                                {isSubmitting ? <Loader2/> : "Créer le disque"}
                             </Button>
                         </motion.div>
                     </div>

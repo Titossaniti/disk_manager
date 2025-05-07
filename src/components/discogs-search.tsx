@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 
 type DiscogsResult = {
     id: number;
@@ -39,14 +39,17 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
 
     const inputRef = useRef<HTMLInputElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const searchDiscogs = async () => {
             if (debouncedQuery.length < 3) {
                 setResults([]);
+                setOpen(false);
                 return;
             }
 
+            setIsLoading(true);
             try {
                 const res = await axios.get("https://api.discogs.com/database/search", {
                     params: {
@@ -60,9 +63,10 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                 setResults(res.data.results);
                 setOpen(true);
             } catch (error) {
-                console.error("Erreur API Discogs :", error);
                 setResults([]);
                 setOpen(false);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -109,6 +113,11 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                         if (results.length > 0) setOpen(true);
                     }}
                 />
+                {isLoading && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1 px-1">
+                        <Loader2 className="animate-spin w-4 h-4" />
+                    </div>
+                )}
                 {selectedText && (
                     <Button variant="ghost" size="icon" onClick={handleReset}>
                         <X className="w-4 h-4" />
