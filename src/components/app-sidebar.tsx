@@ -18,7 +18,6 @@ import { ThemeToggle } from "./theme-toggle"
 
 export function AppSidebar() {
     const { user, isLoading, logout } = useAuth()
-    console.log("AppSidebar mounted", { user, isLoading });
     if (isLoading) return null
     if (!user) return null
 
@@ -88,8 +87,8 @@ export function AppSidebar() {
                             <span className="text-xs text-muted-foreground">{user.email}</span>
                         </div>
                     </div>
-                    <Button variant="destructive" size="icon" onClick={logout}>
-                        <LogOut className="h-4 w-4" />
+                    <Button variant="destructive" size="icon" onClick={logout} className={"cursor-pointer"}>
+                        <LogOut/>
                         <span className="sr-only">Déconnexion</span>
                     </Button>
                 </div>

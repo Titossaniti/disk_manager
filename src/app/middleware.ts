@@ -20,7 +20,7 @@ export function middleware(request: NextRequest) {
 
     // If the path is login and there's a session, redirect to dashboard
     if (isPublicPath && sessionCookie) {
-        const url = new URL("/dashboard", request.url)
+        const url = new URL("/home", request.url)
         return NextResponse.redirect(url)
     }
 

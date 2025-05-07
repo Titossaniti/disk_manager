@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/chart"
 import { BarChart, Bar, CartesianGrid, XAxis } from "recharts"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Combobox } from "@/components/ui/combobox"
+import { CustomCombobox } from "@/components/ui/custom-combobox"
 import {Separator} from "@/components/ui/separator";
 import {useIsMobile} from "@/hooks/use-mobile";
 import {SeparatorVertical} from "lucide-react";
@@ -270,20 +270,20 @@ export default function FilteredStatsChart() {
                 <div className="mt-4 border rounded-md p-2 flex gap-2 flex-col w-fit">
                     <p className="text-sm text-muted-foreground px-1">Filtres</p>
                     <div className="flex flex-wrap gap-2">
-                        <Combobox
+                        <CustomCombobox
                             label="Artiste"
                             fetchUrl="/vinyles/artists"
                             value={artist}
                             onValueChange={setArtist}
                             strictList
                         />
-                        <Combobox
+                        <CustomCombobox
                             label="Lieu d’achat"
                             fetchUrl="/vinyles/buy-places"
                             value={buyPlace}
                             onValueChange={setBuyPlace}
                         />
-                        <Combobox
+                        <CustomCombobox
                             label="Lieu de vente"
                             fetchUrl="/vinyles/selling-places"
                             value={sellingPlace}

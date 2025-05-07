@@ -28,7 +28,6 @@ export const vinyleSchema = z.object({
     genre: z.string().nullable().optional(),
     notes: z.string().nullable().optional(),
     sellingPlace: z.string().nullable().optional(),
-    // sellingDate: z.string().regex(dateFormat, "Format attendu : yyyy-MM-dd").nullable().optional(),
     sellingDate: z
         .union([
             z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format attendu : yyyy-MM-dd"),

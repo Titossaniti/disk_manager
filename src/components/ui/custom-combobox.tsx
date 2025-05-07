@@ -26,7 +26,7 @@ type ComboboxProps = {
     strictList?: boolean
 }
 
-export function Combobox({
+export function CustomCombobox({
                              label,
                              fetchUrl,
                              value,

@@ -15,7 +15,7 @@ export function ThemeToggle() {
             className={"cursor-pointer"}
         >
             {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            <span className="sr-only">Basculer le thème</span>
+            <span className="sr-only">Changer de thème</span>
         </Button>
     )
 }
