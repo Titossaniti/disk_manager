@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/hooks/useAuth"
+import { ThemeToggle } from "./theme-toggle"
 
 export function AppSidebar() {
     const { user, isLoading, logout } = useAuth()
@@ -48,15 +49,19 @@ export function AppSidebar() {
         <Sidebar side="left" variant="sidebar" collapsible="offcanvas">
             <SidebarHeader>
                 <div className="flex items-center gap-2 px-4 py-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary text-primary-foreground flex-[1]">
                         <DiscAlbum className="h-4 w-4" />
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-semibold">Disk Manager</span>
-                        <span className="text-xs text-muted-foreground">{user.pseudonym}</span>
+                    <div className="flex flex-col flex-[4] truncate">
+                        <span className="text-sm font-semibold truncate">Disk Manager</span>
+                        <span className="text-xs text-muted-foreground truncate">{user.pseudonym}</span>
+                    </div>
+                    <div className="flex justify-end flex-[1]">
+                        <ThemeToggle />
                     </div>
                 </div>
             </SidebarHeader>
+
             <SidebarSeparator />
             <SidebarContent>
                 <SidebarMenu className="p-3">
