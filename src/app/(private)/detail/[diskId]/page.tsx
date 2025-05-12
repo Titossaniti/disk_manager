@@ -128,7 +128,7 @@ export default function DetailPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <Button variant="outline" onClick={() => router.push("/vinyles")} className="mb-4">
+            <Button variant="outline" onClick={() => router.push("/vinyles")} className="mb-4 cursor-pointer">
                 ← Retour aux disques
             </Button>
 

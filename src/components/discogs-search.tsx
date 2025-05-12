@@ -207,6 +207,7 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
     const [debouncedQuery] = useDebounce(query, 400);
     const [results, setResults] = useState<DiscogsResult[]>([]);
     const [open, setOpen] = useState(false);
+    const preventReopenRef = useRef(false);
     const [selectedText, setSelectedText] = useState("");
     const [selectedDisc, setSelectedDisc] = useState<DiscogsResult | null>(null);
 
@@ -280,11 +281,11 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                     ref={inputRef}
                     placeholder="Rechercher un disque"
                     value={query}
-                    onChange={(e) => {
-                        setQuery(e.target.value);
-                    }}
+                    onChange={(e) => setQuery(e.target.value)}
                     onFocus={() => {
-                        if (results.length > 0) setOpen(true);
+                        if (!preventReopenRef.current && results.length > 0) {
+                            setOpen(true);
+                        }
                     }}
                 />
                 {isLoading && (
@@ -309,16 +310,22 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                                     key={r.id}
                                     onSelect={() => {
                                         onSelect(r.id);
+                                        preventReopenRef.current = true;
+                                        setOpen(false);
                                         const label = `${r.title} (${r.year || "?"}, ${r.label?.[0] || "?"})`;
                                         setQuery(label);
                                         setSelectedText(label);
                                         setSelectedDisc(r);
-                                        setOpen(false);
                                         inputRef.current?.blur();
+
+                                        setTimeout(() => {
+                                            preventReopenRef.current = false;
+                                        }, 300);
                                     }}
-                                    className="flex gap-3 items-center px-2 py-2"
+                                    className="flex gap-3 items-center px-2 py-2 cursor-pointer"
                                 >
-                                    {r.thumb && (
+
+                                {r.thumb && (
                                         <Image
                                             src={r.thumb}
                                             alt="cover"
@@ -377,12 +384,12 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                             <div className="text-muted-foreground">
                                 <strong>Styles :</strong> {selectedDisc.style?.join(", ") || "—"}
                             </div>
-                            <div className="text-muted-foreground">
-                                <strong>Barcode?? :</strong><br />
-                                {selectedDisc.barcode?.length
-                                    ? selectedDisc.barcode.map((b, i) => <div key={i}>• {b}</div>)
-                                    : "—"}
-                            </div>
+                            {/*<div className="text-muted-foreground">*/}
+                            {/*    <strong>Barcode?? :</strong><br />*/}
+                            {/*    {selectedDisc.barcode?.length*/}
+                            {/*        ? selectedDisc.barcode.map((b, i) => <div key={i}>• {b}</div>)*/}
+                            {/*        : "—"}*/}
+                            {/*</div>*/}
                             <Button
                                 className="mt-2 w-fit"
                                 variant="outline"

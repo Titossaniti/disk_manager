@@ -28,7 +28,7 @@ export default function EditableInputCell({ initialValue, field, id, onVinyleUpd
                 { [field]: value },
                 { withCredentials: true }
             );
-            toast.success("Modifié !");
+            toast.success("Modification enregistrée !");
             setOriginalValue(value);
             setHighlighted(true);
             setTimeout(() => setHighlighted(false), 1500);

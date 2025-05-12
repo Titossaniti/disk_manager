@@ -25,7 +25,7 @@ export default function EditableSelectCell({ initialValue, field, id, options, o
                 { [field]: newValue },
                 { withCredentials: true }
             );
-            toast.success("Modifié !");
+            toast.success("Modification enregistrée !");
             setValue(newValue);
             onVinyleUpdated?.(res.data);
         } catch {

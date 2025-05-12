@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CalendarIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {toast} from "sonner";
 
 type Props = {
     id: number;
@@ -43,12 +44,14 @@ const EditableDateCell: React.FC<Props> = ({
                     withCredentials: true,
                 })
                 .then((res) => {
+                    toast.success("Modification enregistrée !");
                     const updatedValue = res.data[field] ?? null;
                     prevValue.current = updatedValue;
                     setValue(updatedValue ? new Date(updatedValue) : undefined);
                     onVinyleUpdated?.({ [field]: updatedValue });
                 })
                 .catch((err) => {
+                    toast.error("Erreur lors de la mise à jour.");
                     console.error("Erreur lors de la mise à jour de la date :", err);
                 });
         }

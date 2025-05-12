@@ -26,7 +26,7 @@ export default function EditableNumberCell({ initialValue, field, id, onVinyleUp
                 { [field]: numericValue },
                 { withCredentials: true }
             );
-            toast.success("Modifié !");
+            toast.success("Modification enregistrée !");
             setValue(numericValue);
             setOriginalValue(numericValue);
             setHighlighted(true);
