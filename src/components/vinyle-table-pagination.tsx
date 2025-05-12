@@ -41,7 +41,7 @@ export function VinyleTablePagination({
     }
 
     return (
-        <div className="flex flex-col items-center justify-between gap-4 pt-4 md:flex-row w-full">
+        <div className="flex flex-col items-center justify-between gap-4 md:flex-row w-full">
             <div className="text-sm text-muted-foreground whitespace-nowrap">
                 {pagination.totalElements.toLocaleString("fr-FR")}{" "}{pagination.totalElements === 1 ? "résultat" : "résultats"}
             </div>

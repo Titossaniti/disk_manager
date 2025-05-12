@@ -1,12 +1,6 @@
 "use client";
 
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
@@ -16,21 +10,24 @@ type Props = {
     field: string;
     id: number;
     options: string[];
+    onVinyleUpdated?: (updated: any) => void;
 };
 
-export default function EditableSelectCell({ initialValue, field, id, options }: Props) {
+export default function EditableSelectCell({ initialValue, field, id, options, onVinyleUpdated }: Props) {
     const [value, setValue] = useState(initialValue || "");
 
     const handleChange = async (newValue: string) => {
         if (newValue === value) return;
+
         try {
-            await axios.patch(
+            const res = await axios.patch(
                 `${process.env.NEXT_PUBLIC_API_URL}/vinyles/${id}`,
                 { [field]: newValue },
                 { withCredentials: true }
             );
             toast.success("Modifié !");
             setValue(newValue);
+            onVinyleUpdated?.(res.data);
         } catch {
             toast.error("Erreur lors de la mise à jour");
         }
@@ -42,9 +39,9 @@ export default function EditableSelectCell({ initialValue, field, id, options }:
                 <SelectValue placeholder="Choisir..." />
             </SelectTrigger>
             <SelectContent>
-                {options.map((o) => (
-                    <SelectItem key={o} value={o}>
-                        {o}
+                {options.map((opt) => (
+                    <SelectItem key={opt} value={opt}>
+                        {opt}
                     </SelectItem>
                 ))}
             </SelectContent>
