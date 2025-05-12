@@ -378,7 +378,7 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                                 <strong>Styles :</strong> {selectedDisc.style?.join(", ") || "—"}
                             </div>
                             <div className="text-muted-foreground">
-                                <strong>Code-barres :</strong><br />
+                                <strong>Barcode?? :</strong><br />
                                 {selectedDisc.barcode?.length
                                     ? selectedDisc.barcode.map((b, i) => <div key={i}>• {b}</div>)
                                     : "—"}
