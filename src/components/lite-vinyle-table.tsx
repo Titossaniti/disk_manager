@@ -117,9 +117,9 @@ const LiteVinylesTable = () => {
         queryKey: ["vinyles", { ...appliedFilters, page, size, sortBy, sortDirection }],
         queryFn: () => fetchVinyles({ ...appliedFilters, page, size, sortBy, sortDirection }),
         keepPreviousData: true,
-    });
 
-    const [updatedMargins, setUpdatedMargins] = useState<Record<number, number>>({});
+    });
+    const totals = data?.totals;
 
     const toggleEditMode = () => {
         const newMode = !editableMode;
@@ -275,311 +275,340 @@ const LiteVinylesTable = () => {
                     </TableHeader>
 
                     <TableBody>
+                        <TableRow className="bg-muted/40 text-xs font-semibold border-t">
+                            <TableCell colSpan={9}>Totaux</TableCell>
+                            <TableCell>
+                                {(data?.totals?.totalNetBuyPrice ?? 0).toLocaleString("fr-FR", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </TableCell>
+                            <TableCell>
+                                {(data?.totals?.totalNetSellingPrice ?? 0).toLocaleString("fr-FR", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </TableCell>
+                            <TableCell>
+                                {(data?.totals?.totalMargin ?? 0).toLocaleString("fr-FR", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })}
+                            </TableCell>
+                            <TableCell colSpan={4}></TableCell>
+                        </TableRow>
+
                         {rows.map((disk: any) => {
                             const displayedSellingDate =
                                 updatedRows[disk.id]?.sellingDate ?? disk.sellingDate;
 
                             return (
-                            <TableRow
-                                key={disk.id}
-                                onClick={
-                                    !editableMode
-                                        ? () => {
-                                            const artistUrl = encodeURIComponent(disk.artist?.replace(/\s+/g, "-").replace(/["']/g, ""));
-                                            const titleUrl = encodeURIComponent(disk.title?.replace(/\s+/g, "-").replace(/["']/g, ""));
-                                            router.push(`/detail/${disk.id}-${artistUrl}-${titleUrl}`);
-                                        }
-                                        : undefined
-                                }
-                                className={editableMode ? "" : "cursor-pointer hover:bg-muted"}
-                            >
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableSelectCell
-                                            initialValue={updatedRows[disk.id]?.support ?? disk.support}
-                                            field="support"
-                                            id={disk.id}
-                                            options={filtersInit.supports}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
+                                <TableRow
+                                    key={disk.id}
+                                    onClick={
+                                        !editableMode
+                                            ? () => {
+                                                const artistUrl = encodeURIComponent(disk.artist?.replace(/\s+/g, "-").replace(/["']/g, ""));
+                                                const titleUrl = encodeURIComponent(disk.title?.replace(/\s+/g, "-").replace(/["']/g, ""));
+                                                router.push(`/detail/${disk.id}-${artistUrl}-${titleUrl}`);
                                             }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.support ?? disk.support
-                                    )}
-                                </TableCell>
-
-                                <TableCell className="max-w-[100px]">
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.artist ?? disk.artist}
-                                            field="artist"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <div className="truncate">{updatedRows[disk.id]?.artist ?? disk.artist}</div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <span>{updatedRows[disk.id]?.artist ?? disk.artist}</span>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    )}
-                                </TableCell>
-
-                                <TableCell className="max-w-[140px]">
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.title ?? disk.title}
-                                            field="title"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <div className="truncate uppercase">{updatedRows[disk.id]?.title ?? disk.title}</div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <span className={"uppercase"}>{updatedRows[disk.id]?.title ?? disk.title}</span>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    )}
-                                </TableCell>
-
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableSelectCell
-                                            initialValue={updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus}
-                                            field="sellingStatus"
-                                            id={disk.id}
-                                            options={filtersInit.sellingStatuses}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        <Badge className={sellingStatusBadgeColor(updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus)}>
-                                            {updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus}
-                                        </Badge>
-                                    )}
-                                </TableCell>
-
-                                <TableCell className="max-w-[80px]">
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.label ?? disk.label}
-                                            field="label"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        <TooltipProvider>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <div className="truncate">{updatedRows[disk.id]?.label ?? disk.label}</div>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <span>{updatedRows[disk.id]?.label ?? disk.label}</span>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
-                                    )}
-                                </TableCell>
-
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.ref ?? disk.ref}
-                                            field="ref"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.ref ?? disk.ref
-                                    )}
-                                </TableCell>
-
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.countryYear ?? disk.countryYear}
-                                            field="countryYear"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.countryYear ?? disk.countryYear
-                                    )}
-                                </TableCell>
-
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.diskCondition ?? disk.diskCondition}
-                                            field="diskCondition"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.diskCondition ?? disk.diskCondition
-                                    )}
-                                </TableCell>
-
-                                <TableCell>{renderScanStatus(updatedRows[disk.id]?.scanStatus ?? disk.scanStatus)}</TableCell>
-
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableNumberCell
-                                            initialValue={updatedRows[disk.id]?.netBuyPrice ?? disk.netBuyPrice}
-                                            field="netBuyPrice"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.netBuyPrice ?? disk.netBuyPrice
-                                    )}
-                                </TableCell>
-
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableNumberCell
-                                            initialValue={updatedRows[disk.id]?.netSellingPrice ?? disk.netSellingPrice}
-                                            field="netSellingPrice"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.netSellingPrice ?? disk.netSellingPrice
-                                    )}
-                                </TableCell>
-
-                                <TableCell>
-                                    {updatedRows[disk.id]?.margin ?? disk.margin}
-                                </TableCell>
-
-                                <TableCell>{format(new Date(disk.buyDate), "dd/MM/yyyy")}</TableCell>
-
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableDateCell
-                                            initialValue={
-                                                updatedRows[disk.id]?.sellingDate !== undefined
-                                                    ? updatedRows[disk.id]?.sellingDate
-                                                    : disk.sellingDate
-                                            }
-                                            field="sellingDate"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : updatedRows[disk.id]?.sellingDate !== undefined ? (
-                                        updatedRows[disk.id].sellingDate ? (
-                                            format(new Date(updatedRows[disk.id].sellingDate), "dd/MM/yyyy")
+                                            : undefined
+                                    }
+                                    className={editableMode ? "" : "cursor-pointer hover:bg-muted"}
+                                >
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableSelectCell
+                                                initialValue={updatedRows[disk.id]?.support ?? disk.support}
+                                                field="support"
+                                                id={disk.id}
+                                                options={filtersInit.supports}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
                                         ) : (
-                                            <CircleSlash size={16} color="#90A1B9" />
-                                        )
-                                    ) : disk.sellingDate ? (
-                                        format(new Date(disk.sellingDate), "dd/MM/yyyy")
-                                    ) : (
-                                        <CircleSlash size={16} color="#90A1B9" />
-                                    )}
-                                </TableCell>
+                                            updatedRows[disk.id]?.support ?? disk.support
+                                        )}
+                                    </TableCell>
 
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.buyPlace ?? disk.buyPlace}
-                                            field="buyPlace"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.buyPlace ?? disk.buyPlace
-                                    )}
-                                </TableCell>
+                                    <TableCell className="max-w-[100px]">
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.artist ?? disk.artist}
+                                                field="artist"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <div
+                                                            className="truncate">{updatedRows[disk.id]?.artist ?? disk.artist}</div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <span>{updatedRows[disk.id]?.artist ?? disk.artist}</span>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        )}
+                                    </TableCell>
 
-                                <TableCell>
-                                    {editableMode ? (
-                                        <EditableInputCell
-                                            initialValue={updatedRows[disk.id]?.sellingPlace ?? disk.sellingPlace}
-                                            field="sellingPlace"
-                                            id={disk.id}
-                                            onVinyleUpdated={(updated) =>
-                                                setUpdatedRows((prev) => ({
-                                                    ...prev,
-                                                    [disk.id]: { ...prev[disk.id], ...updated },
-                                                }))
-                                            }
-                                        />
-                                    ) : (
-                                        updatedRows[disk.id]?.sellingPlace ?? disk.sellingPlace
-                                    )}
-                                </TableCell>
-                            </TableRow>
+                                    <TableCell className="max-w-[140px]">
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.title ?? disk.title}
+                                                field="title"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <div
+                                                            className="truncate uppercase">{updatedRows[disk.id]?.title ?? disk.title}</div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <span
+                                                            className={"uppercase"}>{updatedRows[disk.id]?.title ?? disk.title}</span>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        )}
+                                    </TableCell>
 
-                        )})}
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableSelectCell
+                                                initialValue={updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus}
+                                                field="sellingStatus"
+                                                id={disk.id}
+                                                options={filtersInit.sellingStatuses}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            <Badge
+                                                className={sellingStatusBadgeColor(updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus)}>
+                                                {updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus}
+                                            </Badge>
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell className="max-w-[80px]">
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.label ?? disk.label}
+                                                field="label"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            <TooltipProvider>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <div
+                                                            className="truncate">{updatedRows[disk.id]?.label ?? disk.label}</div>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        <span>{updatedRows[disk.id]?.label ?? disk.label}</span>
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.ref ?? disk.ref}
+                                                field="ref"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            updatedRows[disk.id]?.ref ?? disk.ref
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.countryYear ?? disk.countryYear}
+                                                field="countryYear"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            updatedRows[disk.id]?.countryYear ?? disk.countryYear
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.diskCondition ?? disk.diskCondition}
+                                                field="diskCondition"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            updatedRows[disk.id]?.diskCondition ?? disk.diskCondition
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>{renderScanStatus(updatedRows[disk.id]?.scanStatus ?? disk.scanStatus)}</TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableNumberCell
+                                                initialValue={updatedRows[disk.id]?.netBuyPrice ?? disk.netBuyPrice}
+                                                field="netBuyPrice"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            updatedRows[disk.id]?.netBuyPrice ?? disk.netBuyPrice
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableNumberCell
+                                                initialValue={updatedRows[disk.id]?.netSellingPrice ?? disk.netSellingPrice}
+                                                field="netSellingPrice"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            updatedRows[disk.id]?.netSellingPrice ?? disk.netSellingPrice
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        {updatedRows[disk.id]?.margin ?? disk.margin}
+                                    </TableCell>
+
+                                    <TableCell>{format(new Date(disk.buyDate), "dd/MM/yyyy")}</TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableDateCell
+                                                initialValue={
+                                                    updatedRows[disk.id]?.sellingDate !== undefined
+                                                        ? updatedRows[disk.id]?.sellingDate
+                                                        : disk.sellingDate
+                                                }
+                                                field="sellingDate"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : updatedRows[disk.id]?.sellingDate !== undefined ? (
+                                            updatedRows[disk.id].sellingDate ? (
+                                                format(new Date(updatedRows[disk.id].sellingDate), "dd/MM/yyyy")
+                                            ) : (
+                                                <CircleSlash size={16} color="#90A1B9"/>
+                                            )
+                                        ) : disk.sellingDate ? (
+                                            format(new Date(disk.sellingDate), "dd/MM/yyyy")
+                                        ) : (
+                                            <CircleSlash size={16} color="#90A1B9"/>
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.buyPlace ?? disk.buyPlace}
+                                                field="buyPlace"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            updatedRows[disk.id]?.buyPlace ?? disk.buyPlace
+                                        )}
+                                    </TableCell>
+
+                                    <TableCell>
+                                        {editableMode ? (
+                                            <EditableInputCell
+                                                initialValue={updatedRows[disk.id]?.sellingPlace ?? disk.sellingPlace}
+                                                field="sellingPlace"
+                                                id={disk.id}
+                                                onVinyleUpdated={(updated) =>
+                                                    setUpdatedRows((prev) => ({
+                                                        ...prev,
+                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                    }))
+                                                }
+                                            />
+                                        ) : (
+                                            updatedRows[disk.id]?.sellingPlace ?? disk.sellingPlace
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+
+                            )
+                        })}
                     </TableBody>
 
                 </Table>
