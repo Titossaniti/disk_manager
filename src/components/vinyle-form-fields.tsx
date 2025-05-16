@@ -7,30 +7,53 @@ import {
     SelectValue,
     SelectContent,
     SelectItem,
-} from "@/components/ui";
-import { Euro } from "lucide-react";
-import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from "react-hook-form";
-import { VinyleFormData, requiredFields, orderedFields} from "@/schema/vinyleSchema";
+} from "@/components/ui"
+import { Euro } from "lucide-react"
+import {
+    UseFormRegister,
+    FieldErrors,
+    UseFormWatch,
+    UseFormSetValue,
+} from "react-hook-form"
+import {
+    VinyleFormData,
+    requiredFields,
+    orderedFields,
+} from "@/schema/vinyleSchema"
+import {DateTimePicker} from "@/components/ui/datetime-picker";
+import { fr } from "date-fns/locale"
+import {format} from "date-fns";
+
 
 type Props = {
-    register: UseFormRegister<VinyleFormData>;
-    errors: FieldErrors<VinyleFormData>;
-    watch: UseFormWatch<VinyleFormData>;
-    setValue: UseFormSetValue<VinyleFormData>;
+    register: UseFormRegister<VinyleFormData>
+    errors: FieldErrors<VinyleFormData>
+    watch: UseFormWatch<VinyleFormData>
+    setValue: UseFormSetValue<VinyleFormData>
     filtersInit: {
-        supports: string[];
-        sellingStatuses: string[];
-    };
-};
+        supports: string[]
+        sellingStatuses: string[]
+    }
+}
 
-export const VinyleFormFields = ({ register, errors, watch, setValue, filtersInit }: Props) => {
+export const VinyleFormFields = ({
+                                     register,
+                                     errors,
+                                     watch,
+                                     setValue,
+                                     filtersInit,
+                                 }: Props) => {
     return (
         <>
             {orderedFields.map((key) => (
                 <div key={key} className="flex flex-col gap-1">
                     <Label className="flex items-center gap-1">
-                        {requiredFields.includes(key) && <span className="text-red-500">*</span>}
-                        {key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? (
+                        {requiredFields.includes(key) && (
+                            <span className="text-red-500">*</span>
+                        )}
+                        {key.includes("Price") ||
+                        key.includes("Fees") ||
+                        key.includes("Commission") ? (
                             <>
                                 {key === "netBuyPrice" && "Prix d'achat"}
                                 {key === "buyDeliveryFees" && "Frais de livraison d'achat"}
@@ -38,9 +61,11 @@ export const VinyleFormFields = ({ register, errors, watch, setValue, filtersIni
                                 {key === "sellingCommission" && "Commission du site de vente"}
                                 {key === "paypalFees" && "Frais Paypal"}
                                 {key === "iebayFees" && "Frais ieBay"}
-                                {key === "sellingDeliveryFees" && "Frais de livraison de vente"}
+                                {key === "sellingDeliveryFees" &&
+                                    "Frais de livraison de vente"}
                                 {key === "cdlpListingPrice" && "Prix CD&LP"}
-                                {key === "discogsSellingPrice" && "Prix Discogs"} <Euro className="w-4 h-4 text-muted-foreground" />
+                                {key === "discogsSellingPrice" && "Prix Discogs"}{" "}
+                                <Euro className="w-4 h-4 text-muted-foreground" />
                             </>
                         ) : (
                             {
@@ -69,41 +94,81 @@ export const VinyleFormFields = ({ register, errors, watch, setValue, filtersIni
                             }[key] || key
                         )}
                     </Label>
+
                     {key === "support" ? (
-                        <Select value={watch("support")} onValueChange={(v) => setValue("support", v)}>
+                        <Select
+                            value={watch("support")}
+                            onValueChange={(v) => setValue("support", v)}
+                        >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Choisir..." />
                             </SelectTrigger>
                             <SelectContent>
                                 {filtersInit.supports.map((s) => (
-                                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                                    <SelectItem key={s} value={s}>
+                                        {s}
+                                    </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     ) : key === "sellingStatus" ? (
-                        <Select value={watch("sellingStatus")} onValueChange={(v) => setValue("sellingStatus", v)}>
+                        <Select
+                            value={watch("sellingStatus")}
+                            onValueChange={(v) => setValue("sellingStatus", v)}
+                        >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Choisir..." />
                             </SelectTrigger>
                             <SelectContent>
                                 {filtersInit.sellingStatuses.map((s) => (
-                                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                                    <SelectItem key={s} value={s}>
+                                        {s}
+                                    </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     ) : key === "notes" || key === "listingIssues" ? (
                         <Textarea {...register(key)} />
+                    ) : key === "buyDate" || key === "sellingDate" ? (
+                        <DateTimePicker
+                            granularity={"day"}
+                            locale={fr}
+                            displayFormat={{ hour24: "PPP", hour12: "PP" }}
+                            value={watch(key) ? new Date(watch(key)) : undefined}
+                            onChange={(date) => {
+                                const formattedDate = date ? format(date, "yyyy-MM-dd", { locale: fr }) : ""
+                                setValue(key, formattedDate)
+                            }}
+                            className="cursor-pointer"
+                        />
                     ) : (
                         <Input
                             type="text"
-                            inputMode={key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? "decimal" : undefined}
-                            min={key.includes("Price") || key.includes("Fees") || key.includes("Commission") ? 0 : undefined}
+                            inputMode={
+                                key.includes("Price") ||
+                                key.includes("Fees") ||
+                                key.includes("Commission")
+                                    ? "decimal"
+                                    : undefined
+                            }
+                            min={
+                                key.includes("Price") ||
+                                key.includes("Fees") ||
+                                key.includes("Commission")
+                                    ? 0
+                                    : undefined
+                            }
                             {...register(key)}
                         />
                     )}
-                    {errors[key] && <p className="text-sm text-red-500">{errors[key]?.message as string}</p>}
+
+                    {errors[key] && (
+                        <p className="text-sm text-red-500">
+                            {errors[key]?.message as string}
+                        </p>
+                    )}
                 </div>
             ))}
         </>
-    );
-};
+    )
+}
