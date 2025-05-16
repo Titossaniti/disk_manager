@@ -119,7 +119,6 @@ const LiteVinylesTable = () => {
         keepPreviousData: true,
 
     });
-    const totals = data?.totals;
 
     const toggleEditMode = () => {
         const newMode = !editableMode;
@@ -170,11 +169,12 @@ const LiteVinylesTable = () => {
 
     const sellingStatusBadgeColor = (status: string) => {
         switch (status) {
-            case "vendu": return "bg-green-700 text-zinc";
-            case "en vente": return "bg-emerald-900 text-zinc";
-            case "pas encore en vente": return "bg-orange-400 text-zinc";
-            case "à mettre en vente": return "bg-red-800 text-zinc";
-            default: return "bg-muted text-zinc";
+            case "réceptionné": return "bg-green-700 dark:text-zinc-100";
+            case "vendu": return "bg-emerald-900 dark:text-zinc-100";
+            case "en vente": return "bg-blue-800 dark:text-zinc-100";
+            case "pas encore en vente": return "bg-orange-400 dark:text-zinc-100";
+            case "à mettre en vente": return "bg-red-800 dark:text-zinc-100";
+            default: return "bg-muted dark:text-zinc-100";
         }
     };
 
@@ -214,61 +214,61 @@ const LiteVinylesTable = () => {
                 <Table>
                     <TableHeader className={"bg-muted/40"}>
                         <TableRow>
-                            <TableHead onClick={() => handleSort("support")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("support")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Support {sortBy === 'support' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("artist")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("artist")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Artiste {sortBy === 'artist' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("title")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("title")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Titre {sortBy === 'title' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("sellingStatus")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("sellingStatus")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Statut {sortBy === 'sellingStatus' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("label")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("label")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Label {sortBy === 'label' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("ref")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("ref")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Réf {sortBy === 'ref' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("countryYear")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("countryYear")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Pressage {sortBy === 'countryYear' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("diskCondition")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("diskCondition")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 État {sortBy === 'diskCondition' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("scanStatus")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("scanStatus")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Scan {sortBy === 'scanStatus' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("netBuyPrice")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("netBuyPrice")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 <div className="flex items-center gap-1">
                                     Achat <Euro size={14}/>
                                     {sortBy === 'netBuyPrice' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                                 </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort("netSellingPrice")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("netSellingPrice")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 <div className="flex items-center gap-1">
                                     Vente <Euro size={14}/>
                                     {sortBy === 'netSellingPrice' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                                 </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort("margin")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("margin")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 <div className="flex items-center gap-1">
                                     Marge <Euro size={14}/>
                                     {sortBy === 'margin' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                                 </div>
                             </TableHead>
-                            <TableHead onClick={() => handleSort("buyDate")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("buyDate")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Date achat {sortBy === 'buyDate' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("sellingDate")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("sellingDate")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Date vente {sortBy === 'sellingDate' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("buyPlace")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("buyPlace")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Lieu achat {sortBy === 'buyPlace' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
-                            <TableHead onClick={() => handleSort("sellingPlace")} className="cursor-pointer">
+                            <TableHead onClick={() => handleSort("sellingPlace")} className="cursor-pointer dark:hover:bg-zinc-600 hover:bg-zinc-200">
                                 Lieu vente {sortBy === 'sellingPlace' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableHead>
                         </TableRow>
@@ -299,8 +299,6 @@ const LiteVinylesTable = () => {
                         </TableRow>
 
                         {rows.map((disk: any) => {
-                            const displayedSellingDate =
-                                updatedRows[disk.id]?.sellingDate ?? disk.sellingDate;
 
                             return (
                                 <TableRow

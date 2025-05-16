@@ -412,7 +412,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                     handleKeyDown(e);
                     commandProps?.onKeyDown?.(e);
                 }}
-                className={cn('h-auto overflow-visible bg-transparent', commandProps?.className)}
+                className={cn('h-[36px] overflow-visible ', commandProps?.className)}
                 shouldFilter={
                     commandProps?.shouldFilter !== undefined ? commandProps.shouldFilter : !onSearch
                 }
@@ -494,7 +494,7 @@ const MultipleSelector = React.forwardRef<MultipleSelectorRef, MultipleSelectorP
                                 }}
                                 placeholder={hidePlaceholderWhenSelected && selected.length !== 0 ? '' : placeholder}
                                 className={cn(
-                                    'flex-1 bg-transparent outline-none placeholder:text-[#F5F7F9] text-sm',
+                                    'flex-1 bg-transparent outline-none  text-sm',
                                     {
                                         'w-full': hidePlaceholderWhenSelected,
                                         'px-0': selected.length !== 0,

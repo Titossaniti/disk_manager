@@ -282,12 +282,12 @@ function Calendar({
                 nav: 'space-x-1 flex items-center ',
                 button_previous: cn(
                     buttonVariants({ variant: 'outline' }),
-                    'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-5 top-5',
+                    'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute left-5 top-5 cursor-pointer',
                     disableLeftNavigation() && 'pointer-events-none',
                 ),
                 button_next: cn(
                     buttonVariants({ variant: 'outline' }),
-                    'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-5 top-5',
+                    'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 absolute right-5 top-5 cursor-pointer',
                     disableRightNavigation() && 'pointer-events-none',
                 ),
                 month_grid: 'w-full border-collapse space-y-1',
@@ -297,7 +297,7 @@ function Calendar({
                 day: 'h-9 w-9 text-center text-sm p-0 relative [&:has([aria-selected].day-range-end)]:rounded-r-md [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 rounded-1',
                 day_button: cn(
                     buttonVariants({ variant: 'ghost' }),
-                    'h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-l-md rounded-r-md',
+                    'h-9 w-9 p-0 font-normal aria-selected:opacity-100 rounded-l-md rounded-r-md cursor-pointer',
                 ),
                 range_end: 'day-range-end',
                 selected:
@@ -328,12 +328,12 @@ function Calendar({
                                     props.onMonthChange?.(newDate);
                                 }}
                             >
-                                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0">
+                                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 cursor-pointer px-2 capitalize">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {MONTHS.map((month) => (
-                                        <SelectItem key={month.value} value={month.value.toString()}>
+                                        <SelectItem key={month.value} value={month.value.toString()} className={"capitalize"}>
                                             {month.label}
                                         </SelectItem>
                                     ))}
@@ -347,7 +347,7 @@ function Calendar({
                                     props.onMonthChange?.(newDate);
                                 }}
                             >
-                                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0">
+                                <SelectTrigger className="focus:bg-accent focus:text-accent-foreground w-fit gap-1 border-none p-0 cursor-pointer px-2">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -667,6 +667,7 @@ type DateTimePickerProps = {
      * Show the default month and time when popup the calendar. Default is the current Date().
      **/
     defaultPopupValue?: Date;
+    onPopoverClose?: () => void;
 } & Pick<DayPickerProps, 'locale' | 'weekStartsOn' | 'showWeekNumber' | 'showOutsideDays'>;
 
 type DateTimePickerRef = {
@@ -688,6 +689,7 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
             granularity = 'second',
             placeholder = 'Choisir une date',
             className,
+            onPopoverClose,
             ...props
         },
         ref,
@@ -770,7 +772,12 @@ const DateTimePicker = React.forwardRef<Partial<DateTimePickerRef>, DateTimePick
         }
 
         return (
-            <Popover>
+            <Popover
+                onOpenChange={(open) => {
+            if (!open) {
+                onPopoverClose?.();
+            }
+            }}>
                 <PopoverTrigger asChild disabled={disabled}>
                     <Button
                         variant="outline"
