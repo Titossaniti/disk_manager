@@ -327,37 +327,50 @@ export default function FilteredStatsChart() {
                         <p className="text-sm font-medium mb-4 px-1">
                             Statistiques de la sélection (toutes années confondues)
                         </p>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-                            <Card className="p-4">
-                                <div className="text-xs text-muted-foreground">Vendus</div>
-                                <div className="text-lg font-semibold text-foreground">
-                                    {new Intl.NumberFormat("fr-FR").format(globalStats.sold)}
-                                </div>
-                            </Card>
-                            <Card className="p-4">
-                                <div className="text-xs text-muted-foreground mb-1">En vente</div>
-                                <div className="text-lg font-semibold text-foreground">
-                                    {new Intl.NumberFormat("fr-FR").format(globalStats.inSale)}
-                                </div>
-                            </Card>
-                            <Card className="p-4">
-                                <div className="text-xs text-muted-foreground mb-1">À mettre en vente</div>
-                                <div className="text-lg font-semibold text-foreground">
-                                    {new Intl.NumberFormat("fr-FR").format(globalStats.notInSale)}
-                                </div>
-                            </Card>
-                            <Card className="p-4">
-                                <div className="text-xs text-muted-foreground mb-1">Chiffre d'affaires</div>
-                                <div className="text-lg font-semibold text-foreground">
-                                    {new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(globalStats.revenue)} €
-                                </div>
-                            </Card>
-                            <Card className="p-4">
-                                <div className="text-xs text-muted-foreground mb-1">Marge</div>
-                                <div className="text-lg font-semibold text-foreground">
-                                    {new Intl.NumberFormat("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(globalStats.margin)} €
-                                </div>
-                            </Card>
+                        <div className="space-y-4">
+                            {/* Ligne 1 : 3 cards */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <Card className="p-4">
+                                    <div className="text-xs text-muted-foreground">Vendus</div>
+                                    <div className="text-lg font-semibold text-foreground">
+                                        {new Intl.NumberFormat("fr-FR").format(globalStats.sold)}
+                                    </div>
+                                </Card>
+                                <Card className="p-4">
+                                    <div className="text-xs text-muted-foreground mb-1">En vente</div>
+                                    <div className="text-lg font-semibold text-foreground">
+                                        {new Intl.NumberFormat("fr-FR").format(globalStats.inSale)}
+                                    </div>
+                                </Card>
+                                <Card className="p-4">
+                                    <div className="text-xs text-muted-foreground mb-1">À mettre en vente</div>
+                                    <div className="text-lg font-semibold text-foreground">
+                                        {new Intl.NumberFormat("fr-FR").format(globalStats.notInSale)}
+                                    </div>
+                                </Card>
+                            </div>
+
+                            {/* Ligne 2 : 2 cards */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <Card className="p-4">
+                                    <div className="text-xs text-muted-foreground mb-1">Chiffre d'affaires</div>
+                                    <div className="text-lg font-semibold text-foreground">
+                                        {new Intl.NumberFormat("fr-FR", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(globalStats.revenue)} €
+                                    </div>
+                                </Card>
+                                <Card className="p-4">
+                                    <div className="text-xs text-muted-foreground mb-1">Marge</div>
+                                    <div className="text-lg font-semibold text-foreground">
+                                        {new Intl.NumberFormat("fr-FR", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(globalStats.margin)} €
+                                    </div>
+                                </Card>
+                            </div>
                         </div>
                     </div>
                 )}

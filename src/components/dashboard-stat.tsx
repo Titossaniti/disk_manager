@@ -12,12 +12,15 @@ type Stats = {
     countInSale: number
     countSold: number
     countNotInSale: number
+    countToPutInSale: number
+    countIsReceived: number
     totalRevenue: number
     totalMargin: number
+    totalOtherBuyExpenses: number
     countSoldThisPeriod: number | null
-    countInSaleThisPeriod: number | null
     revenueThisPeriod: number | null
     marginThisPeriod: number | null
+    otherBuyExpensesThisPeriod: number | null
 }
 
 export default function DashboardStat() {
@@ -117,11 +120,6 @@ export default function DashboardStat() {
                 </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <StatCard title="Vendus" value={currentStats?.countSold} />
-                <StatCard title="En vente" value={currentStats?.countInSale} />
-                <StatCard title="Pas encore en vente" value={lastMonthStats?.countNotInSale} />
-                <StatCard title="Vendus ce mois-ci" value={currentStats?.countSoldThisPeriod} />
-                <StatCard title="Vendus le mois dernier" value={lastMonthStats?.countSoldThisPeriod} />
                 <Card className="flex flex-col justify-between">
                     <CardHeader>
                         <CardTitle>Statistiques détaillées</CardTitle>
@@ -136,6 +134,13 @@ export default function DashboardStat() {
                         </Link>
                     </CardContent>
                 </Card>
+                <StatCard title="Vendus ce mois-ci" value={currentStats?.countSoldThisPeriod} />
+                <StatCard title="Vendus le mois dernier" value={lastMonthStats?.countSoldThisPeriod} />
+                <StatCard title="Vendus" value={currentStats?.countSold} />
+                <StatCard title="Réceptionné" value={currentStats?.countIsReceived} />
+                <StatCard title="En vente" value={currentStats?.countInSale} />
+                <StatCard title="Pas encore en vente" value={currentStats?.countNotInSale} />
+                <StatCard title="À mettre en vente" value={currentStats?.countToPutInSale} />
             </div>
         </div>
     )
