@@ -43,7 +43,7 @@ export function AppSidebar() {
             href: "/create",
         },
         {
-            title: "Autre frais",
+            title: "Mes autres frais",
             icon: ReceiptEuro,
             href: "/other-expenses",
         },

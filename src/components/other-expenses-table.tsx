@@ -1,65 +1,185 @@
 "use client"
 
-import { OtherBuy } from "@/schema/otherBuy"
-import { useEffect, useState } from "react"
-import { format } from "date-fns"
+import {OtherBuy, OtherBuyForm, otherBuyFormSchema} from "@/schema/otherBuy"
+import { format, parseISO } from "date-fns"
 import { fr } from "date-fns/locale"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
+import { DateTimePicker } from "@/components/ui/datetime-picker"
+import {
+    Table,
+    TableHeader,
+    TableBody,
+    TableRow,
+    TableHead,
+    TableCell,
+} from "@/components/ui/table"
+import { Euro } from "lucide-react"
 
-export function OtherExpensesTable() {
-    const [expenses, setExpenses] = useState<OtherBuy[]>([])
-    const [loading, setLoading] = useState(true)
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 
-    useEffect(() => {
-        async function fetchExpenses() {
-            try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/other-buys`, {
-                    credentials: "include",
-                })
-                const json = await res.json()
-                setExpenses(json)
-            } catch (err) {
-                console.error("Erreur fetch other-buys", err)
-            } finally {
-                setLoading(false)
-            }
-        }
+import React from "react"
 
-        fetchExpenses()
-    }, [])
+type Props = {
+    expenses: OtherBuy[]
+    loading: boolean
+    editMode: boolean
+    updatedRows: Record<number, Partial<OtherBuy>>
+    onUpdateRow: (id: number, data: Partial<OtherBuy>) => void
+    onDelete: (id: number) => void
+    onAddNew: (data: OtherBuyForm) => void
+}
+
+export function OtherExpensesTable({
+                                       expenses,
+                                       loading,
+                                       editMode,
+                                       updatedRows,
+                                       onUpdateRow,
+                                       onDelete,
+                                       onAddNew,
+                                   }: Props) {
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors },
+        reset,
+    } = useForm<OtherBuyForm>({
+        resolver: zodResolver(otherBuyFormSchema),
+        defaultValues: {
+            buyDate: new Date().toISOString().split("T")[0],
+        },
+    })
 
     return (
         <Card className="p-4">
-            <h2 className="text-lg font-semibold mb-4">Toutes les autres dépenses</h2>
             {loading ? (
                 <Skeleton className="w-full h-[200px]" />
-            ) : expenses.length === 0 ? (
-                <p className="text-muted-foreground text-sm">Aucune dépense enregistrée.</p>
             ) : (
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm border">
-                        <thead>
-                        <tr className="bg-muted">
-                            <th className="px-2 py-1 border">Nom</th>
-                            <th className="px-2 py-1 border">Prix</th>
-                            <th className="px-2 py-1 border">Frais</th>
-                            <th className="px-2 py-1 border">Date</th>
-                            <th className="px-2 py-1 border">Catégorie</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {expenses.map((e) => (
-                            <tr key={e.id}>
-                                <td className="border px-2 py-1">{e.name}</td>
-                                <td className="border px-2 py-1">{e.buyPrice.toFixed(2)} €</td>
-                                <td className="border px-2 py-1">{e.buyFees?.toFixed(2) ?? "0.00"} €</td>
-                                <td className="border px-2 py-1">{format(new Date(e.buyDate), "dd MMM yyyy", { locale: fr })}</td>
-                                <td className="border px-2 py-1">{e.category}</td>
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
+                    <Table>
+                        <TableHeader className="bg-muted/80">
+                            <TableRow>
+                                <TableHead>Nom</TableHead>
+                                <TableHead><div className="flex items-center gap-1">Prix <Euro size={14}/></div></TableHead>
+                                <TableHead><div className="flex items-center gap-1">Frais <Euro size={14}/></div></TableHead>
+                                <TableHead>Date</TableHead>
+                                <TableHead>Catégorie</TableHead>
+                                {editMode && <TableHead className="text-center">Actions</TableHead>}
+                            </TableRow>
+                        </TableHeader>
+
+                        <TableBody>
+                            {expenses.map((e) => {
+                                const updated = updatedRows[e.id] ?? {}
+                                return (
+                                    <TableRow key={e.id}>
+                                        <TableCell className="capitalize">
+                                            {editMode ? (
+                                                <Input defaultValue={updated.name ?? e.name} onChange={(ev) => onUpdateRow(e.id, { name: ev.target.value })} />
+                                            ) : e.name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {editMode ? (
+                                                <Input type="number" defaultValue={updated.buyPrice ?? e.buyPrice} onChange={(ev) => {
+                                                    const value = ev.target.value
+                                                    const num = value === "" ? 0 : parseFloat(value)
+                                                    onUpdateRow(e.id, { buyPrice: num })
+                                                }} />
+                                            ) : `${Number(updated.buyPrice ?? e.buyPrice ?? 0).toFixed(2)}`}
+                                        </TableCell>
+                                        <TableCell>
+                                            {editMode ? (
+                                                <Input type="number" defaultValue={updated.buyFees ?? e.buyFees ?? 0} onChange={(ev) => {
+                                                    const value = ev.target.value
+                                                    const num = value === "" ? 0 : parseFloat(value)
+                                                    onUpdateRow(e.id, { buyFees: num })
+                                                }} />
+                                            ) : `${Number(updated.buyFees ?? e.buyFees ?? 0).toFixed(2)}`}
+                                        </TableCell>
+                                        <TableCell>
+                                            {editMode ? (
+                                                <DateTimePicker
+                                                    granularity="day"
+                                                    locale={fr}
+                                                    displayFormat={{ hour24: "PPP" }}
+                                                    value={updated.buyDate ? new Date(updated.buyDate) : new Date(e.buyDate)}
+                                                    onChange={(d) => onUpdateRow(e.id, { buyDate: d?.toISOString().split("T")[0] })}
+                                                />
+                                            ) : format(parseISO(e.buyDate), "dd MMM yyyy", { locale: fr })}
+                                        </TableCell>
+                                        <TableCell className="capitalize">
+                                            {editMode ? (
+                                                <Input defaultValue={updated.category ?? e.category} onChange={(ev) => onUpdateRow(e.id, { category: ev.target.value })} />
+                                            ) : e.category}
+                                        </TableCell>
+                                        {editMode && (
+                                            <TableCell className="text-center">
+                                                <Button size="sm" variant="destructive" onClick={() => onDelete(e.id)}>Supprimer</Button>
+                                            </TableCell>
+                                        )}
+                                    </TableRow>
+                                )
+                            })}
+
+                            {editMode && (
+                                <TableRow className="bg-muted/20">
+                                    <TableCell>
+                                        <div className="space-y-1">
+                                            <Input {...register("name")} placeholder="Nom" />
+                                            {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="space-y-1">
+                                            <Input type="number" step="0.01" {...register("buyPrice")} placeholder="Prix" />
+                                            {errors.buyPrice && <p className="text-xs text-destructive">{errors.buyPrice.message}</p>}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="space-y-1">
+                                            <Input type="number" step="0.01" {...register("buyFees")} placeholder="Frais" />
+                                            {errors.buyFees && <p className="text-xs text-destructive">{errors.buyFees.message}</p>}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="space-y-1">
+                                            <DateTimePicker
+                                                granularity="day"
+                                                locale={fr}
+                                                displayFormat={{ hour24: "PPP" }}
+                                                value={watch("buyDate") ? new Date(watch("buyDate")) : new Date()}
+                                                onChange={(d) => setValue("buyDate", d?.toISOString().split("T")[0] || "")}
+                                            />
+                                            {errors.buyDate && <p className="text-xs text-destructive">{errors.buyDate.message}</p>}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="space-y-1">
+                                            <Input {...register("category")} placeholder="Catégorie" />
+                                            {errors.category && <p className="text-xs text-destructive">{errors.category.message}</p>}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell className="text-center">
+                                        <Button
+                                            size="sm"
+                                            onClick={handleSubmit((data) => {
+                                                onAddNew(data)
+                                                reset({ buyDate: new Date().toISOString().split("T")[0] })
+                                            })}
+                                        >
+                                            Ajouter
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
             )}
         </Card>
