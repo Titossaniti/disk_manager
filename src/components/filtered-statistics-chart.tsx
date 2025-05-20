@@ -38,7 +38,7 @@ type MonthlyStat = {
     revenue: number
     margin: number
     sold: number
-    label: string
+    label?: string
 }
 
 const chartConfig = {

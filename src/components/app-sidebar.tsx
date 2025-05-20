@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import {LayoutDashboard, LogOut, Disc3, DiscAlbum, FilePlus, ChartColumn} from "lucide-react"
+import {LayoutDashboard, LogOut, Disc3, DiscAlbum, FilePlus, ChartColumn, ReceiptEuro} from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -41,6 +41,11 @@ export function AppSidebar() {
             title: "Ajouter un disque",
             icon: FilePlus,
             href: "/create",
+        },
+        {
+            title: "Autre frais",
+            icon: ReceiptEuro,
+            href: "/other-expenses",
         },
     ]
 
