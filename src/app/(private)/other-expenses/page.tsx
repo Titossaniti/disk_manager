@@ -1,10 +1,10 @@
-// ✅ other-expenses/page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
 import { OtherBuy, OtherBuyForm } from "@/schema/otherBuy"
 import { OtherExpensesTable } from "@/components/other-expenses-table"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 export default function OtherExpensesPage() {
     const [expenses, setExpenses] = useState<OtherBuy[]>([])
@@ -71,8 +71,10 @@ export default function OtherExpensesPage() {
 
             setUpdatedRows({})
             setEditMode(false)
+            toast.success("Modifications enregistrées")
         } catch (e) {
             console.error("Erreur lors de la sauvegarde", e)
+            toast.error("Échec de la mise à jour")
         }
     }
 
@@ -83,8 +85,10 @@ export default function OtherExpensesPage() {
                 credentials: "include",
             })
             setExpenses((prev) => prev.filter((e) => e.id !== id))
+            toast.success("Dépense supprimée")
         } catch (e) {
             console.error("Erreur suppression", e)
+            toast.error("Erreur lors de la suppression de la dépense")
         }
     }
 
@@ -104,8 +108,10 @@ export default function OtherExpensesPage() {
 
             const created: OtherBuy = await res.json()
             setExpenses(prev => [created, ...prev])
+            toast.success("Dépense ajoutée")
         } catch (e) {
             console.error("Erreur ajout", e)
+            toast.error("Erreur lors de l'ajout de la dépense")
         }
     }
 

@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import {OtherBuy, OtherBuyForm, otherBuyFormSchema} from "@/schema/otherBuy"
 import { format, parseISO } from "date-fns"
 import { fr } from "date-fns/locale"
@@ -20,8 +21,6 @@ import { Euro } from "lucide-react"
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-
-import React from "react"
 
 type Props = {
     expenses: OtherBuy[]
