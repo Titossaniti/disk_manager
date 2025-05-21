@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/pagination";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
-interface VinyleTablePaginationProps {
+interface TablePaginationProps {
     pagination: {
         page: number;
         totalPages: number;
@@ -25,13 +25,13 @@ interface VinyleTablePaginationProps {
     setSize: (size: number) => void;
 }
 
-export function VinyleTablePagination({
+export function TablePagination({
                                           pagination,
                                           page,
                                           setPage,
                                           size,
                                           setSize,
-                                      }: VinyleTablePaginationProps) {
+                                      }: TablePaginationProps) {
     if (pagination.totalElements === 0) {
         return (
             <div className="text-center text-sm text-muted-foreground py-8">

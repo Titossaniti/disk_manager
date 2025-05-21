@@ -5,7 +5,7 @@ import { OtherBuy, OtherBuyForm } from "@/schema/otherBuy"
 import { OtherExpensesTable } from "@/components/other-expenses-table"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import {VinyleTablePagination} from "@/components/vinyle-table-pagination";
+import {TablePagination} from "@/components/table-pagination";
 
 type OtherBuyPaginatedResponse = {
     content: OtherBuy[]
@@ -179,7 +179,7 @@ export default function OtherExpensesPage() {
                 onAddNew={handleAdd}
             />
             {pagination && (
-                <VinyleTablePagination
+                <TablePagination
                     pagination={pagination}
                     page={page}
                     setPage={setPage}

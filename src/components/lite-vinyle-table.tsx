@@ -7,7 +7,7 @@ import { format, parseISO, isValid } from "date-fns";
 import { useSearchParams, useRouter } from "next/navigation";
 
 import { VinyleFiltersForm } from "./vinyle-filter-form";
-import { VinyleTablePagination } from "@/components/vinyle-table-pagination";
+import { TablePagination } from "@/components/table-pagination";
 import EditableInputCell from "@/components/editable-input-cell";
 import EditableNumberCell from "@/components/editable-number-cell";
 import EditableSelectCell from "@/components/editable-select-cell";
@@ -199,7 +199,7 @@ const LiteVinylesTable = () => {
 
             <Separator/>
 
-            <VinyleTablePagination pagination={pagination} page={page} setPage={setPage} size={size} setSize={setSize}/>
+            <TablePagination pagination={pagination} page={page} setPage={setPage} size={size} setSize={setSize}/>
 
             <div className="flex justify-between items-center">
                 <div className="text-sm text-muted-foreground">
@@ -612,7 +612,7 @@ const LiteVinylesTable = () => {
                 </Table>
             </div>
 
-            <VinyleTablePagination pagination={pagination} page={page} setPage={setPage} size={size} setSize={setSize}/>
+            <TablePagination pagination={pagination} page={page} setPage={setPage} size={size} setSize={setSize}/>
         </div>
     );
 };
