@@ -111,7 +111,7 @@ export function VinyleTablePagination({
                         <SelectValue placeholder="Taille"/>
                     </SelectTrigger>
                     <SelectContent>
-                        {[50, 100, 150, 200].map((val) => (
+                        {[10, 50, 100, 150, 200].map((val) => (
                             <SelectItem key={val} value={val.toString()} className="cursor-pointer">
                                 {val}
                             </SelectItem>

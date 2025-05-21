@@ -1,7 +1,7 @@
 "use client"
 
 import React from "react"
-import {OtherBuy, OtherBuyForm, otherBuyFormSchema} from "@/schema/otherBuy"
+import {OtherBuy, OtherBuyForm, otherBuyFormSchema, OtherBuyResponse} from "@/schema/otherBuy"
 import { format, parseISO } from "date-fns"
 import { fr } from "date-fns/locale"
 import { Input } from "@/components/ui/input"
@@ -23,7 +23,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 type Props = {
-    expenses: OtherBuy[]
+    expenses: OtherBuyResponse
     loading: boolean
     editMode: boolean
     updatedRows: Record<number, Partial<OtherBuy>>
@@ -55,12 +55,25 @@ export function OtherExpensesTable({
         },
     })
 
+
     return (
         <Card className="p-4">
             {loading ? (
                 <Skeleton className="w-full h-[200px]" />
             ) : (
                 <div className="overflow-x-auto">
+                    {expenses?.totals && (
+                        <div className="mb-4">
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm font-medium text-muted-foreground">
+                                <div className="bg-muted px-4 py-2 rounded-md w-full sm:w-auto text-center sm:text-left">
+                                    Total achats : <span className="text-foreground">{expenses.totals.totalBuyPrice.toFixed(2)} €</span>
+                                </div>
+                                <div className="bg-muted px-4 py-2 rounded-md w-full sm:w-auto text-center sm:text-left">
+                                    Avec frais : <span className="text-foreground">{expenses.totals.totalBuyPriceWithFees.toFixed(2)} €</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                     <Table>
                         <TableHeader className="bg-muted/80">
                             <TableRow>
@@ -74,14 +87,20 @@ export function OtherExpensesTable({
                         </TableHeader>
 
                         <TableBody>
-                            {expenses.map((e) => {
+
+                            {expenses?.content?.map((e) => {
                                 const updated = updatedRows[e.id] ?? {}
                                 return (
                                     <TableRow key={e.id}>
                                         <TableCell className="capitalize">
                                             {editMode ? (
-                                                <Input defaultValue={updated.name ?? e.name} onChange={(ev) => onUpdateRow(e.id, { name: ev.target.value })} />
-                                            ) : e.name}
+                                                <Input
+                                                    defaultValue={updated.name ?? e.name}
+                                                    onChange={(ev) => onUpdateRow(e.id, { name: ev.target.value })}
+                                                />
+                                            ) : (
+                                                e.name
+                                            )}
                                         </TableCell>
                                         <TableCell>
                                             {editMode ? (

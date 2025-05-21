@@ -5,6 +5,26 @@ import { OtherBuy, OtherBuyForm } from "@/schema/otherBuy"
 import { OtherExpensesTable } from "@/components/other-expenses-table"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import {VinyleTablePagination} from "@/components/vinyle-table-pagination";
+
+type OtherBuyPaginatedResponse = {
+    content: OtherBuy[]
+    pagination: {
+        page: number
+        size: number
+        totalElements: number
+        totalPages: number
+        first: boolean
+        last: boolean
+        sortBy: string | null
+        direction: string | null
+    }
+    totals: {
+        totalBuyPrice: number
+        totalBuyPriceWithFees: number
+    }
+}
+
 
 export default function OtherExpensesPage() {
     const [expenses, setExpenses] = useState<OtherBuy[]>([])
@@ -12,15 +32,24 @@ export default function OtherExpensesPage() {
     const [editMode, setEditMode] = useState(false)
     const [updatedRows, setUpdatedRows] = useState<Record<number, Partial<OtherBuy>>>({})
 
+    const [page, setPage] = useState(0)
+    const [size, setSize] = useState(10)
+    const [pagination, setPagination] = useState<OtherBuyPaginatedResponse["pagination"] | null>(null)
+    const [totals, setTotals] = useState<OtherBuyPaginatedResponse["totals"] | null>(null)
+
+
+
     useEffect(() => {
         async function fetchExpenses() {
+            setLoading(true)
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/other-buys`, {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/other-buys?page=${page}&size=${size}&sortBy=buyDate&direction=desc`, {
                     credentials: "include",
                 })
-                const json = await res.json()
-                const sorted = json.sort((a: OtherBuy, b: OtherBuy) => new Date(b.buyDate).getTime() - new Date(a.buyDate).getTime())
-                setExpenses(sorted)
+                const json: OtherBuyPaginatedResponse = await res.json()
+                setExpenses(json.content)
+                setPagination(json.pagination)
+                setTotals(json.totals)
             } catch (err) {
                 console.error("Erreur fetch other-buys", err)
             } finally {
@@ -29,7 +58,7 @@ export default function OtherExpensesPage() {
         }
 
         fetchExpenses()
-    }, [])
+    }, [page, size])
 
     const handleUpdateRow = (id: number, updated: Partial<OtherBuy>) => {
         setUpdatedRows((prev) => ({
@@ -117,21 +146,31 @@ export default function OtherExpensesPage() {
 
     return (
         <div className="space-y-6 p-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Autres dépenses</h1>
-                    <p className="text-muted-foreground">Activez l'édition pour ajouter, modifier et supprimer des frais annexes.</p>
+                    <p className="text-muted-foreground">
+                        Activez l'édition pour ajouter, modifier et supprimer des frais annexes.
+                    </p>
                 </div>
-                <div className="flex gap-2">
-                    {editMode && <Button onClick={handleSaveAll}>Enregistrer les modifications</Button>}
-                    <Button variant={editMode ? "outline" : "default"} onClick={() => setEditMode((v) => !v)}>
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    {editMode && (
+                        <Button className="w-full sm:w-auto" onClick={handleSaveAll}>
+                            Enregistrer les modifications
+                        </Button>
+                    )}
+                    <Button
+                        variant={editMode ? "outline" : "default"}
+                        className="w-full sm:w-auto"
+                        onClick={() => setEditMode((v) => !v)}
+                    >
                         {editMode ? "Quitter le mode édition" : "Activer l'édition"}
                     </Button>
                 </div>
             </div>
 
             <OtherExpensesTable
-                expenses={expenses}
+                expenses={{ content: expenses, totals: totals! }}
                 loading={loading}
                 editMode={editMode}
                 updatedRows={updatedRows}
@@ -139,6 +178,15 @@ export default function OtherExpensesPage() {
                 onDelete={handleDelete}
                 onAddNew={handleAdd}
             />
+            {pagination && (
+                <VinyleTablePagination
+                    pagination={pagination}
+                    page={page}
+                    setPage={setPage}
+                    size={size}
+                    setSize={setSize}
+                />
+            )}
         </div>
     )
 }
