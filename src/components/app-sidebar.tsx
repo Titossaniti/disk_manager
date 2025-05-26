@@ -1,7 +1,17 @@
 "use client"
 
 import Link from "next/link"
-import {LayoutDashboard, LogOut, Disc3, DiscAlbum, FilePlus, ChartColumn, ReceiptEuro, Contact} from "lucide-react"
+import {
+    LayoutDashboard,
+    LogOut,
+    Disc3,
+    DiscAlbum,
+    FilePlus,
+    ChartColumn,
+    ReceiptEuro,
+    Contact,
+    UserPen
+} from "lucide-react"
 import {
     Sidebar,
     SidebarContent,
@@ -51,6 +61,11 @@ export function AppSidebar() {
             title: "Contact",
             icon: Contact,
             href: "/contacter",
+        },
+        {
+            title: "Mon profil",
+            icon: UserPen,
+            href: "/profile",
         },
     ]
 

@@ -76,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const data = await response.json()
             setUser(data.user ?? { id: "1", email, name: email.split("@")[0], role: "USER" })
 
-            router.push("/dashboard")
+            router.push("/home")
             return { success: true }
         } catch (error) {
             console.error("Login error:", error)
