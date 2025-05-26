@@ -1,53 +1,75 @@
-// app/components/dashboard-cards.tsx
 "use client"
 
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Contact, Plus, ReceiptEuro } from "lucide-react"
 import { useRouter } from "next/navigation"
+import React from "react";
 
-export default function DashboardCards() {
+type DashboardCardProps = {
+    title: string
+    description: string
+    icon?: React.ReactNode
+    imageSrc?: string
+    route: string
+}
+
+const DashboardCard = ({ title, description, icon, imageSrc, route }: DashboardCardProps) => {
     const router = useRouter()
 
     return (
+        <Card onClick={() => router.push(route)} className="group cursor-pointer hover:shadow-lg transition">
+            <CardHeader>
+                <CardTitle>{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center items-center pt-4">
+                <div className="transition-transform duration-300 group-hover:scale-125">
+                    {imageSrc ? (
+                        <img src={imageSrc} alt="Icône de l'application" className="h-24 w-24 rounded shadow-md" />
+                    ) : (
+                        <Button
+                            className="rounded-full h-24 w-24 p-0 cursor-pointer border border-2 hover:bg-gray-400"
+                            variant="icon"
+                        >
+                            {icon}
+                        </Button>
+                    )}
+                </div>
+            </CardContent>
+        </Card>
+    )
+}
+
+export default function DashboardCards() {
+    return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-muted-foreground text-xl">Rubriques principales</h2>
-            </div>
+            <h2 className="text-muted-foreground text-xl">Rubriques principales</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Card onClick={() => router.push("/vinyles")} className="group cursor-pointer hover:shadow-lg transition">
-                    <CardHeader>
-                        <CardTitle>Accéder à mes vinyles</CardTitle>
-                        <CardDescription>Consultez, filtrez et gérez votre collection</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex justify-center items-center pt-4">
-                        <div className="flex justify-center items-center transition-transform duration-300 group-hover:scale-125">
-                            <img src="../android-chrome-192x192.png" alt="Icône Vinyle" className="h-24 w-24 rounded shadow-md" />
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card onClick={() => router.push("/create")} className="group cursor-pointer hover:shadow-lg transition">
-                    <CardHeader>
-                        <CardTitle>Ajouter un disque</CardTitle>
-                        <CardDescription>Accédez au formulaire pour ajouter un disque à la base de données</CardDescription>
-                    </CardHeader>
-                    <CardContent className="flex justify-center items-center pt-4">
-                        <div className="transition-transform duration-300 group-hover:scale-125">
-                            <Button
-                                onClick={(e) => {
-                                    e.stopPropagation()
-                                    router.push("/create")
-                                }}
-                                className="rounded-full h-24 w-24 p-0 cursor-pointer border border-2 hover:bg-gray-400"
-                                variant="icon"
-                            >
-                                <Plus className="h-10 w-10" />
-                            </Button>
-                        </div>
-                    </CardContent>
-                </Card>
-
+                <DashboardCard
+                    title="Accéder à mes vinyles"
+                    description="Consultez, filtrez et gérez votre collection de disque"
+                    imageSrc="../android-chrome-192x192.png"
+                    route="/vinyles"
+                />
+                <DashboardCard
+                    title="Ajouter un disque"
+                    description="Accédez au formulaire pour ajouter un disque à la base de données"
+                    icon={<Plus />}
+                    route="/create"
+                />
+                <DashboardCard
+                    title="Mes autres frais"
+                    description="Accédez à vos frais annexes pour les consulter ou en ajouter"
+                    icon={<ReceiptEuro />}
+                    route="/other-expenses"
+                />
+                <DashboardCard
+                    title="Contact"
+                    description="Accédez au formulaire pour contacter l'équipe de développement"
+                    icon={<Contact />}
+                    route="/contact"
+                />
             </div>
         </div>
     )

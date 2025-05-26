@@ -139,8 +139,11 @@ export default function DashboardStat() {
                 <StatCard title="Vendus" value={currentStats?.countSold} />
                 <StatCard title="Réceptionné" value={currentStats?.countIsReceived} />
                 <StatCard title="En vente" value={currentStats?.countInSale} />
-                <StatCard title="Pas encore en vente" value={currentStats?.countNotInSale} />
-                <StatCard title="À mettre en vente" value={currentStats?.countToPutInSale} />
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 col-span-1 md:col-span-2 lg:col-span-3 gap-4">
+                    <StatCard title="Pas encore en vente" value={currentStats?.countNotInSale} />
+                    <StatCard title="À mettre en vente" value={currentStats?.countToPutInSale} />
+                </div>
             </div>
         </div>
     )
