@@ -162,7 +162,6 @@ export function OtherExpensesTable({
                                     <TableCell>
                                         <div className="space-y-1">
                                             <Input type="number" step="0.01" {...register("buyFees")} placeholder="Frais" />
-                                            {errors.buyFees && <p className="text-xs text-destructive">{errors.buyFees.message}</p>}
                                         </div>
                                     </TableCell>
                                     <TableCell>
@@ -180,7 +179,6 @@ export function OtherExpensesTable({
                                     <TableCell>
                                         <div className="space-y-1">
                                             <Input {...register("category")} placeholder="Catégorie" />
-                                            {errors.category && <p className="text-xs text-destructive">{errors.category.message}</p>}
                                         </div>
                                     </TableCell>
                                     <TableCell className="text-center">

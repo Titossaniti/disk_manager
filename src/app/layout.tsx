@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <body className={inter.className}>
                 <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
                     {children}
-                    <Toaster richColors closeButton />
+                    <Toaster richColors closeButton position="top-right"/>
                 </ThemeProvider>
             </body>
         </html>
