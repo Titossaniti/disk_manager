@@ -20,13 +20,19 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
-const schema = z.object({
-    newPassword: z
-        .string()
-        .min(8, 'Le mot de passe doit faire au moins 8 caractères')
-        .regex(/[A-Z]/, 'Le mot de passe doit contenir une majuscule')
-        .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Le mot de passe doit contenir un caractère spécial'),
-})
+const schema = z
+    .object({
+        newPassword: z
+            .string()
+            .min(8, 'Le mot de passe doit faire au moins 8 caractères')
+            .regex(/[A-Z]/, 'Le mot de passe doit contenir une majuscule')
+            .regex(/[!@#$%^&*(),.?":{}|<>]/, 'Le mot de passe doit contenir un caractère spécial'),
+        confirmPassword: z.string(),
+    })
+    .refine((data) => data.newPassword === data.confirmPassword, {
+        message: 'Les mots de passe ne correspondent pas.',
+        path: ['confirmPassword'],
+    })
 
 export default function ResetPasswordPage() {
     const searchParams = useSearchParams()
@@ -36,7 +42,10 @@ export default function ResetPasswordPage() {
 
     const form = useForm({
         resolver: zodResolver(schema),
-        defaultValues: { newPassword: '' },
+        defaultValues: {
+            newPassword: '',
+            confirmPassword: '',
+        },
     })
 
     const onSubmit = async ({ newPassword }: { newPassword: string }) => {
@@ -88,7 +97,7 @@ export default function ResetPasswordPage() {
                 </CardHeader>
                 <CardContent>
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                             <FormField
                                 control={form.control}
                                 name="newPassword"
@@ -97,6 +106,20 @@ export default function ResetPasswordPage() {
                                         <FormLabel>Nouveau mot de passe</FormLabel>
                                         <FormControl>
                                             <Input type="password" placeholder="Nouveau mot de passe" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Confirmer le mot de passe</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="Répétez le mot de passe" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

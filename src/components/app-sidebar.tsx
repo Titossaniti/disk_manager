@@ -102,16 +102,10 @@ export function AppSidebar() {
             <SidebarSeparator />
             <SidebarFooter>
                 <div className="flex items-center justify-between px-4 py-2">
-                    <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                            <AvatarImage src={`https://avatar.vercel.sh/${user.id}`} alt={user.pseudonym} />
-                            <AvatarFallback>{user?.pseudonym?.charAt(0)?.toUpperCase() ?? "?"}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex flex-col">
-                            <span className="text-sm font-medium">{user.pseudonym}</span>
-                            <span className="text-xs text-muted-foreground">{user.email}</span>
-                        </div>
-                    </div>
+                    <Link href={"/profile"} className="flex flex-col">
+                        <span className="text-sm font-medium">{user.pseudonym}</span>
+                        <span className="text-xs text-muted-foreground">{user.email}</span>
+                    </Link>
                     <Button variant="destructive" size="icon" onClick={logout} className={"cursor-pointer"}>
                         <LogOut/>
                         <span className="sr-only">Déconnexion</span>
