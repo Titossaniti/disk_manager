@@ -22,7 +22,6 @@ import {
     SidebarSeparator,
 } from "@/components/ui/sidebar"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useAuth } from "@/hooks/useAuth"
 import { ThemeToggle } from "./theme-toggle"
 
@@ -102,7 +101,7 @@ export function AppSidebar() {
             <SidebarSeparator />
             <SidebarFooter>
                 <div className="flex items-center justify-between px-4 py-2">
-                    <Link href={"/profile"} className="flex flex-col">
+                    <Link href="/profile" className="flex flex-col">
                         <span className="text-sm font-medium">{user.pseudonym}</span>
                         <span className="text-xs text-muted-foreground">{user.email}</span>
                     </Link>

@@ -29,7 +29,7 @@ export function RequestEmailChangeForm() {
         if (res.ok) {
             toast.success("Email envoyé ! Vérifiez votre boîte mail.")
         } else {
-            toast.error("Erreur lors de lor de l'envoi de l'email de confirmation.")
+            toast.error("Erreur lors de l'envoi de l'email de confirmation.")
         }
     }
 
@@ -47,7 +47,7 @@ export function RequestEmailChangeForm() {
                         </FormItem>
                     )}
                 />
-                <Button type="submit">Demander le changement d'email</Button>
+                <Button type="submit">Modifier l'email</Button>
             </form>
         </Form>
     )

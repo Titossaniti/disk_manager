@@ -42,7 +42,7 @@ export default function ProfilePage() {
             <h2 className="text-2xl font-semibold">Modifiez les informations de votre profil</h2>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Colonne gauche : pseudonym + email */}
+
                 <Card className="flex flex-col justify-between h-full">
                     <CardHeader>
                         <CardTitle>Modifier vos informations</CardTitle>
@@ -57,7 +57,6 @@ export default function ProfilePage() {
                     </CardContent>
                 </Card>
 
-                {/* Colonne droite : mot de passe */}
                 <Card className="flex flex-col  h-full">
                     <CardHeader>
                         <CardTitle>Modifier le mot de passe</CardTitle>
