@@ -1,14 +1,24 @@
 'use client'
 
-import { useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import Link from 'next/link'
+import { Disc3 } from 'lucide-react'
+
+import {
+    Card,
+    CardContent,
+    CardHeader,
+    CardTitle,
+    CardDescription,
+} from '@/components/ui/card'
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { toast } from 'sonner'
 
 const schema = z.object({
     newPassword: z
@@ -20,8 +30,8 @@ const schema = z.object({
 
 export default function ResetPasswordPage() {
     const searchParams = useSearchParams()
-    const router = useRouter()
     const token = searchParams.get('token')
+    const router = useRouter()
     const [loading, setLoading] = useState(false)
 
     const form = useForm({
@@ -45,7 +55,7 @@ export default function ResetPasswordPage() {
 
             if (!response.ok) {
                 const errorData = await response.json()
-                throw new Error(errorData.message || 'Erreur lors de la réinitialisation')
+                throw new Error(errorData.message || 'Erreur lors de la réinitialisation.')
             }
 
             toast.success('Mot de passe modifié avec succès.')
@@ -58,29 +68,48 @@ export default function ResetPasswordPage() {
     }
 
     return (
-        <div className="max-w-md mx-auto mt-24 p-6 border rounded-2xl shadow-xl">
-            <h1 className="text-2xl font-semibold mb-6 text-center">Réinitialiser le mot de passe</h1>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                        control={form.control}
-                        name="newPassword"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Nouveau mot de passe</FormLabel>
-                                <FormControl>
-                                    <Input type="password" placeholder="Nouveau mot de passe" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+        <div className="flex min-h-screen flex-col items-center px-4 pt-20 space-y-6">
+            <Link
+                href="/login"
+                className="flex items-center gap-2 font-medium text-sm text-muted-foreground"
+            >
+                <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                    <Disc3 className="size-4" />
+                </div>
+                <p>Disk Manager</p>
+            </Link>
 
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? 'En cours...' : 'Réinitialiser'}
-                    </Button>
-                </form>
-            </Form>
+            <Card className="w-full max-w-xl">
+                <CardHeader className="text-center">
+                    <CardTitle className="text-3xl">Réinitialiser le mot de passe</CardTitle>
+                    <CardDescription className="text-sm sm:text-base">
+                        Entrez un nouveau mot de passe sécurisé pour votre compte.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                            <FormField
+                                control={form.control}
+                                name="newPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Nouveau mot de passe</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" placeholder="Nouveau mot de passe" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <Button type="submit" className="w-full" disabled={loading}>
+                                {loading ? 'En cours...' : 'Réinitialiser'}
+                            </Button>
+                        </form>
+                    </Form>
+                </CardContent>
+            </Card>
         </div>
     )
 }
