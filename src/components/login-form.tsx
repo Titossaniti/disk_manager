@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/useAuth"
+import Link from "next/link";
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
     const { login, isLoading } = useAuth()
@@ -38,8 +39,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
                 <CardHeader className="text-center">
-                    <CardTitle className="text-xl">Welcome back</CardTitle>
-                    <CardDescription>Enter your credentials to login</CardDescription>
+                    <CardTitle className="text-xl">Bienvenue,</CardTitle>
+                    <CardDescription>Entrez vos identifiants pour vous connecter</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit}>
@@ -48,19 +49,19 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                             <div className="grid gap-6">
                                 <div className="grid gap-2">
                                     <Label htmlFor="email">Email</Label>
-                                    <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+                                    <Input id="email" name="email" type="email" placeholder="exemple@mail.com" required />
                                 </div>
                                 <div className="grid gap-2">
                                     <div className="flex items-center">
-                                        <Label htmlFor="password">Password</Label>
-                                        <a href="#" className="ml-auto text-sm underline-offset-4 hover:underline">
-                                            Forgot your password?
-                                        </a>
+                                        <Label htmlFor="password">Mot de passe</Label>
+                                        <Link href="/forgot-password" className="ml-auto text-sm underline-offset-4 hover:underline text-muted-foreground">
+                                            Mot de passe oublié ?
+                                        </Link>
                                     </div>
-                                    <Input id="password" name="password" type="password" required />
+                                    <Input id="password" name="password" type="password" placeholder="********" required />
                                 </div>
                                 <Button type="submit" className="w-full" disabled={isLoading}>
-                                    {isLoading ? "Logging in..." : "Login"}
+                                    {isLoading ? "Connexion..." : "Connexion"}
                                 </Button>
                             </div>
                         </div>
@@ -68,7 +69,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 </CardContent>
             </Card>
             <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-                By clicking continue, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+                En vous connectant ou en nous contactant, vous acceptez nos <a href="#">Conditions d'utilisation</a> et notre <a href="#">Politique de confidentialité</a>.
             </div>
         </div>
     )
