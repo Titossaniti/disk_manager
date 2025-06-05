@@ -7,7 +7,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { toast } from "sonner";
-import { AnimatePresence, motion } from "framer-motion";
 import { CircleCheckBig, CircleSlash, Loader2 } from "lucide-react";
 
 import {
@@ -67,7 +66,7 @@ export default function DetailPage() {
     const form = useForm<VinyleFormData>({
         resolver: zodResolver(vinyleSchema),
     });
-    const { register, handleSubmit, setValue, watch, formState: { errors, isSubmitting, dirtyFields } } = form;
+    const { handleSubmit, setValue, watch, formState: { isSubmitting, dirtyFields }, reset } = form;
 
     const { data: filtersInit, isLoading: isLoadingFilters } = useQuery({
         queryKey: ["vinyles", "filters", "initialization"],
@@ -127,6 +126,19 @@ export default function DetailPage() {
         }
     }, [searchParams, router]);
 
+    const handleEdit = () => {
+        setIsEditing(true);
+    };
+
+    const handleCancel = () => {
+        reset();
+        setIsEditing(false);
+    };
+
+    const onSubmit = (data: VinyleFormData) => {
+        updateVinyle.mutate(data);
+    };
+
     if (isLoading || isLoadingFilters || !filtersInit) {
         return (
             <div className="p-4 space-y-4">
@@ -137,13 +149,61 @@ export default function DetailPage() {
         );
     }
 
-    if (isError || !data) return <div className="p-4 text-red-600">Erreur de chargement</div>;
+    if (isError || !data) return <div className="p-4 text-red-600">Erreur de chargement. Il se peut que le disque recherché n'existe pas.</div>;
 
     return (
         <div className="p-4 md:p-6 space-y-6">
-            <Button variant="outline" onClick={() => router.push("/vinyles")} className="mb-4 cursor-pointer">
-                ← Retour aux disques
-            </Button>
+            <div className="flex justify-between items-center">
+                <Button variant="outline" onClick={() => router.push("/vinyles")} className="cursor-pointer">
+                    ← Retour aux disques
+                </Button>
+                {!isEditing ? (
+                    <div className="flex gap-2">
+                        <Button onClick={handleEdit} variant="outline">
+                            Modifier
+                        </Button>
+                        <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="destructive">Supprimer</Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Confirmer la suppression</DialogTitle>
+                                </DialogHeader>
+                                <p>Êtes-vous sûr de vouloir supprimer ce disque ? Cette action est irréversible.</p>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button variant="outline">Annuler</Button>
+                                    </DialogClose>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => deleteVinyle.mutate()}
+                                        disabled={deleteVinyle.isPending}
+                                    >
+                                        {deleteVinyle.isPending ? <Loader2 className="animate-spin" /> : "Confirmer"}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                ) : (
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={handleCancel}
+                            disabled={isSubmitting}
+                        >
+                            Annuler
+                        </Button>
+                        <Button
+                            onClick={handleSubmit(onSubmit)}
+                            disabled={isSubmitting || !Object.keys(dirtyFields).length}
+                        >
+                            {isSubmitting ? <Loader2 className="animate-spin" /> : "Enregistrer"}
+                        </Button>
+                    </div>
+                )}
+            </div>
 
             <div className="flex flex-col md:flex-row gap-6">
                 {discogsData?.cover_image && (
@@ -151,7 +211,7 @@ export default function DetailPage() {
                         <img
                             src={discogsData.cover_image}
                             alt="cover"
-                            className="rounded-lg shadow-md w-full max-w-[150px] md:max-w-[200px]"
+                            className="shadow-md w-full max-w-[150px] md:max-w-[200px]"
                         />
                     </div>
                 )}
@@ -168,34 +228,68 @@ export default function DetailPage() {
 
             <Separator/>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Résumé</CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <p><strong>Support :</strong> {data.support}</p>
-                    <p><strong>Pressage :</strong> {data.countryYear}</p>
-                    <p><strong>Label :</strong> {data.label}</p>
-                    <p><strong>Genre :</strong> {data.genre}</p>
-                    <p><strong>État :</strong> {data.diskCondition}</p>
-                    <p><strong>Statut :</strong> <Badge
-                        className={sellingStatusBadgeColor(data.sellingStatus)}>{data.sellingStatus || "?"}</Badge></p>
-                    <p><strong>Marge :</strong> {data.margin} €</p>
-                    <p><strong>Référence :</strong> {data.ref}</p>
-                    <p><strong>Scan :</strong> {renderScanStatus(data.scanStatus)}</p>
-                    <p className="sm:col-span-2 lg:col-span-3"><strong>Notes :</strong> {data.notes}</p>
-                    {discogsData?.id && discogsData?.type && (
-                        <a
-                            href={`https://www.discogs.com/${discogsData.type}/${discogsData.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 underline sm:col-span-2 lg:col-span-3"
+            <form onSubmit={handleSubmit(onSubmit)}>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Résumé</CardTitle>
+                    </CardHeader>
+                    <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {isEditing ? (
+                            <VinyleFormFields
+                                form={form}
+                                filtersInit={filtersInit}
+                                isEditing={isEditing}
+                                register={form.register}
+                                errors={form.formState.errors}
+                                watch={form.watch}
+                                setValue={form.setValue}
+                            />
+                        ) : (
+                            <>
+                                <p><strong>Support :</strong> {data.support}</p>
+                                <p><strong>Pressage :</strong> {data.countryYear}</p>
+                                <p><strong>Label :</strong> {data.label}</p>
+                                <p><strong>Genre :</strong> {data.genre}</p>
+                                <p><strong>État :</strong> {data.diskCondition}</p>
+                                <p><strong>Statut :</strong> <Badge
+                                    className={sellingStatusBadgeColor(data.sellingStatus)}>{data.sellingStatus || "?"}</Badge></p>
+                                <p><strong>Marge :</strong> {data.margin} €</p>
+                                <p><strong>Référence :</strong> {data.ref}</p>
+                                <p className="flex items-center space-x-2"><strong>Scan :</strong>{renderScanStatus(data.scanStatus)}</p>
+                                <p className="sm:col-span-2 lg:col-span-3"><strong>Notes :</strong> {data.notes}</p>
+                                {discogsData?.id && discogsData?.type && (
+                                    <a
+                                        href={`https://www.discogs.com/${discogsData.type}/${discogsData.id}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-blue-600 underline sm:col-span-2 lg:col-span-3"
+                                    >
+                                        Voir la page du disque sur Discogs
+                                    </a>
+                                )}
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+
+                {isEditing && (
+                    <div className="flex justify-end gap-2 mt-4">
+                        <Button
+                            variant="outline"
+                            onClick={handleCancel}
+                            disabled={isSubmitting}
                         >
-                            Voir la page du disque sur Discogs
-                        </a>
-                    )}
-                </CardContent>
-            </Card>
+                            Annuler
+                        </Button>
+                        <Button
+                            type="submit"
+                            disabled={isSubmitting || !Object.keys(dirtyFields).length}
+                        >
+                            {isSubmitting ? <Loader2 className="animate-spin" /> : "Enregistrer"}
+                        </Button>
+                    </div>
+                )}
+            </form>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full justify-start gap-2">

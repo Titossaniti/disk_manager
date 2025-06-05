@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { format, parseISO, isValid } from "date-fns";
+import { format } from "date-fns";
 import { useSearchParams, useRouter } from "next/navigation";
 
 import { VinyleFiltersForm } from "./vinyle-filter-form";
