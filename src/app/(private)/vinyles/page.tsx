@@ -5,6 +5,7 @@ import LiteVinylesTable from "@/components/lite-vinyle-table";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import React from "react";
+import BackButton from "@/components/back-button";
 
 export default function VinylesPage() {
 
@@ -22,11 +23,12 @@ export default function VinylesPage() {
 
     return (
         <div className="space-y-6 p-6">
+            <BackButton/>
             <div className="space-y-1">
                 <h1 className="text-2xl font-bold tracking-tight">Mes disques</h1>
                 <p className="text-muted-foreground">Filtrez, triez et explorez les vinyles.</p>
             </div>
-            <LiteVinylesTable />
+            <LiteVinylesTable/>
         </div>
     );
 }

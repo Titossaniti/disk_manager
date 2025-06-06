@@ -34,6 +34,7 @@ import { Badge } from "@/components/ui/badge";
 import { vinyleSchema, VinyleFormData } from "@/schema/vinyleSchema";
 import { VinyleFormFields } from "@/components/vinyle-form-fields";
 import { useDiscogsData } from "@/hooks/use-discogs-data";
+import BackButton from "@/components/back-button";
 
 const sellingStatusBadgeColor = (status: string) => {
     switch (status) {
@@ -153,18 +154,23 @@ export default function DetailPage() {
 
     return (
         <div className="p-4 md:p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <Button variant="outline" onClick={() => router.push("/vinyles")} className="cursor-pointer">
-                    ← Retour aux disques
-                </Button>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                {/* Retour en haut sur mobile */}
+                <div className="self-start">
+                    <BackButton />
+                </div>
+
+                {/* Modifier + Supprimer côte à côte */}
                 {!isEditing ? (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 self-start sm:self-auto">
                         <Button onClick={handleEdit} variant="outline">
                             Modifier
                         </Button>
                         <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
                             <DialogTrigger asChild>
-                                <Button variant="destructive">Supprimer</Button>
+                                <Button variant="destructive">
+                                    Supprimer
+                                </Button>
                             </DialogTrigger>
                             <DialogContent>
                                 <DialogHeader>
@@ -187,7 +193,7 @@ export default function DetailPage() {
                         </Dialog>
                     </div>
                 ) : (
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 self-start sm:self-auto">
                         <Button
                             variant="outline"
                             onClick={handleCancel}
@@ -203,6 +209,7 @@ export default function DetailPage() {
                         </Button>
                     </div>
                 )}
+
             </div>
 
             <div className="flex flex-col md:flex-row gap-6">
@@ -262,6 +269,7 @@ export default function DetailPage() {
                                         className="mt-2 w-fit"
                                         variant="outline"
                                         size="sm"
+                                        type="button"
                                         onClick={() =>
                                         window.open(`https://www.discogs.com/${discogsData.type}/${discogsData.id}`, "_blank")
                                         }

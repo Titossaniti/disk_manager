@@ -394,6 +394,7 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                                 className="mt-2 w-fit"
                                 variant="outline"
                                 size="sm"
+                                type="button"
                                 onClick={() =>
                                     window.open(`https://www.discogs.com${selectedDisc.uri}`, "_blank")
                                 }

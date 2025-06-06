@@ -6,6 +6,7 @@ import {UpdatePseudonymForm} from "@/components/user/update-pseudonym-form";
 import {RequestEmailChangeForm} from "@/components/user/update-email-form";
 import {UpdatePasswordForm} from "@/components/user/update-password-form";
 import { Skeleton } from "@/components/ui/skeleton"
+import BackButton from "@/components/back-button";
 
 type CurrentUser = {
     pseudonym: string
@@ -39,7 +40,8 @@ export default function ProfilePage() {
 
     return (
         <div className="p-6 space-y-6">
-            <h2 className="text-2xl font-semibold">Modifiez les informations de votre profil</h2>
+            <BackButton/>
+            <h1 className="text-2xl font-semibold">Modifiez les informations de votre profil</h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 

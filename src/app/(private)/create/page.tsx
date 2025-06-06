@@ -19,6 +19,7 @@ import {VinyleFormFields} from "@/components/vinyle-form-fields";
 import {orderedFields, vinyleSchema} from "@/schema/vinyleSchema";
 import {DiscogsSearch} from "@/components/discogs-search";
 import {Loader2} from "lucide-react";
+import BackButton from "@/components/back-button";
 
 type VinyleFormData = z.infer<typeof vinyleSchema>;
 
@@ -106,10 +107,12 @@ export default function AddVinyleForm() {
 
     return (
         <div>
+
             <form onSubmit={handleSubmit(onSubmit, () => {
                 toast.error("Veuillez corriger les erreurs dans le formulaire.");
             })} className="p-6 space-y-6">
-                <div className="space-y-1">
+                <div className="space-y-2">
+                    <BackButton/>
                     <h1 className="text-2xl font-bold tracking-tight">Ajouter un nouveau disque</h1>
                     <p className="text-muted-foreground">Complétez les champs du formulaire et validez pour ajouter
                         votre disque à la base de données !</p>

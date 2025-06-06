@@ -1,11 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { OtherBuy, OtherBuyForm } from "@/schema/otherBuy"
 import { OtherExpensesTable } from "@/components/other-expenses-table"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import {TablePagination} from "@/components/table-pagination";
+import BackButton from "@/components/back-button";
 
 type OtherBuyPaginatedResponse = {
     content: OtherBuy[]
@@ -146,7 +147,9 @@ export default function OtherExpensesPage() {
 
     return (
         <div className="space-y-6 p-6">
+            <BackButton/>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">Autres dépenses</h1>
                     <p className="text-muted-foreground">
