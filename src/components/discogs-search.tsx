@@ -397,6 +397,7 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
                                 onClick={() =>
                                     window.open(`https://www.discogs.com${selectedDisc.uri}`, "_blank")
                                 }
+                                rel="noopener noreferrer"
                             >
                                 🌐 Voir sur Discogs
                             </Button>

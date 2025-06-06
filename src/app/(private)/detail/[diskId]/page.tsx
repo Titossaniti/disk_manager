@@ -2,7 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
@@ -258,14 +258,17 @@ export default function DetailPage() {
                                 <p className="flex items-center space-x-2"><strong>Scan :</strong>{renderScanStatus(data.scanStatus)}</p>
                                 <p className="sm:col-span-2 lg:col-span-3"><strong>Notes :</strong> {data.notes}</p>
                                 {discogsData?.id && discogsData?.type && (
-                                    <a
-                                        href={`https://www.discogs.com/${discogsData.type}/${discogsData.id}`}
-                                        target="_blank"
+                                    <Button
+                                        className="mt-2 w-fit"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() =>
+                                        window.open(`https://www.discogs.com/${discogsData.type}/${discogsData.id}`, "_blank")
+                                        }
                                         rel="noopener noreferrer"
-                                        className="text-blue-600 underline sm:col-span-2 lg:col-span-3"
                                     >
-                                        Voir la page du disque sur Discogs
-                                    </a>
+                                        🌐 Voir sur Discogs
+                                    </Button>
                                 )}
                             </>
                         )}
