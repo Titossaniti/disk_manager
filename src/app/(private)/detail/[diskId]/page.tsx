@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { toast } from "sonner";
 import { CircleCheckBig, CircleSlash, Loader2 } from "lucide-react";
+import { formatDateDDMMYYYY } from "@/lib/utils";
 
 import {
     Button,
@@ -154,6 +155,17 @@ export default function DetailPage() {
 
     if (isError || !data) return <div className="p-4 text-red-600">Erreur de chargement. Il se peut que le disque recherché n'existe pas.</div>;
 
+    const contentGridClasses = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6";
+
+    function Field({ label, value }: { label: string; value?: string | number }) {
+        return (
+            <div className="flex flex-col border-b pb-2">
+                <span className="text-sm font-medium text-muted-foreground">{label}</span>
+                <span className="mt-1 whitespace-pre-line">{value || "—"}</span>
+            </div>
+        );
+    }
+
     return (
         <div className="p-4 md:p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -211,7 +223,6 @@ export default function DetailPage() {
                         </Button>
                     </div>
                 )}
-
             </div>
 
             <div className="flex flex-col md:flex-row gap-6">
@@ -242,7 +253,7 @@ export default function DetailPage() {
                     <CardHeader>
                         <CardTitle>Résumé</CardTitle>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {isEditing ? (
                             <VinyleFormFields
                                 form={form}
@@ -255,30 +266,75 @@ export default function DetailPage() {
                             />
                         ) : (
                             <>
-                                <p><strong>Support :</strong> {data.support}</p>
-                                <p><strong>Pressage :</strong> {data.countryYear}</p>
-                                <p><strong>Label :</strong> {data.label}</p>
-                                <p><strong>Genre :</strong> {data.genre}</p>
-                                <p><strong>État :</strong> {data.diskCondition}</p>
-                                <p><strong>Statut :</strong> <Badge
-                                    className={sellingStatusBadgeColor(data.sellingStatus)}>{data.sellingStatus || "?"}</Badge></p>
-                                <p><strong>Marge :</strong> {data.margin} €</p>
-                                <p><strong>Référence :</strong> {data.ref}</p>
-                                <p className="flex items-center space-x-2"><strong>Scan :</strong>{renderScanStatus(data.scanStatus)}</p>
-                                <p className="sm:col-span-2 lg:col-span-3"><strong>Notes :</strong> {data.notes}</p>
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Support</span>
+                                    <span className="mt-1">{data.support}</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Pressage</span>
+                                    <span className="mt-1">{data.countryYear}</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Label</span>
+                                    <span className="mt-1">{data.label}</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Genre</span>
+                                    <span className="mt-1">{data.genre}</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">État</span>
+                                    <span className="mt-1">{data.diskCondition}</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Statut</span>
+                                    <span className="mt-1">
+                                    <Badge className={sellingStatusBadgeColor(data.sellingStatus)}>
+                                        {data.sellingStatus || "?"}
+                                    </Badge>
+                                </span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Marge</span>
+                                    <span className="mt-1">{data.margin} €</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Référence</span>
+                                    <span className="mt-1">{data.ref}</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2">
+                                    <span className="text-sm font-medium text-muted-foreground">Scan</span>
+                                    <span className="mt-1">{renderScanStatus(data.scanStatus)}</span>
+                                </div>
+
+                                <div className="flex flex-col border-b pb-2 sm:col-span-2 lg:col-span-3">
+                                    <span className="text-sm font-medium text-muted-foreground">Notes</span>
+                                    <span className="mt-1 whitespace-pre-line">{data.notes || 'Aucune note'}</span>
+                                </div>
+
                                 {discogsData?.id && discogsData?.type && (
-                                    <Button
-                                        className="mt-2 w-fit"
-                                        variant="outline"
-                                        size="sm"
-                                        type="button"
-                                        onClick={() =>
-                                        window.open(`https://www.discogs.com/${discogsData.type}/${discogsData.id}`, "_blank")
-                                        }
-                                        rel="noopener noreferrer"
-                                    >
-                                        🌐 Voir sur Discogs
-                                    </Button>
+                                    <div className="sm:col-span-2 lg:col-span-3">
+                                        <Button
+                                            className="mt-2 w-fit"
+                                            variant="outline"
+                                            size="sm"
+                                            type="button"
+                                            onClick={() =>
+                                                window.open(`https://www.discogs.com/${discogsData.type}/${discogsData.id}`, "_blank")
+                                            }
+                                            rel="noopener noreferrer"
+                                        >
+                                            🌐 Voir sur Discogs
+                                        </Button>
+                                    </div>
                                 )}
                             </>
                         )}
@@ -315,11 +371,26 @@ export default function DetailPage() {
                 <TabsContent value="achat">
                     <Card className="mt-4">
                         <CardHeader><CardTitle>Informations d'achat</CardTitle></CardHeader>
-                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <p><strong>Date :</strong> {data.buyDate}</p>
-                            <p><strong>Lieu :</strong> {data.buyPlace}</p>
-                            <p><strong>Prix net :</strong> {data.netBuyPrice} €</p>
-                            <p><strong>Frais livraison :</strong> {data.buyDeliveryFees} €</p>
+                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Date</span>
+                                <span className="mt-1">{formatDateDDMMYYYY(data.buyDate)}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Lieu</span>
+                                <span className="mt-1">{data.buyPlace}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Prix net</span>
+                                <span className="mt-1">{data.netBuyPrice} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Frais livraison</span>
+                                <span className="mt-1">{data.buyDeliveryFees} €</span>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -327,17 +398,56 @@ export default function DetailPage() {
                 <TabsContent value="vente">
                     <Card className="mt-4">
                         <CardHeader><CardTitle>Informations de vente</CardTitle></CardHeader>
-                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <p><strong>Date :</strong> {data.sellingDate}</p>
-                            <p><strong>Lieu :</strong> {data.sellingPlace}</p>
-                            <p><strong>Prix net :</strong> {data.netSellingPrice} €</p>
-                            <p><strong>Frais livraison :</strong> {data.sellingDeliveryFees} €</p>
-                            <p><strong>Commission :</strong> {data.sellingCommission} €</p>
-                            <p><strong>Frais Paypal :</strong> {data.paypalFees} €</p>
-                            <p><strong>Frais eBay :</strong> {data.iebayFees} €</p>
-                            <p><strong>Statut du paiement :</strong> {data.paymentStatus}</p>
-                            <p><strong>Statut de la livraison :</strong> {data.deliveryStatus}</p>
-                            <p><strong>Réception :</strong> {data.isReceived}</p>
+                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Date</span>
+                                <span className="mt-1">{formatDateDDMMYYYY(data.sellingDate)}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Lieu</span>
+                                <span className="mt-1">{data.sellingPlace}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Prix net</span>
+                                <span className="mt-1">{data.netSellingPrice} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Frais livraison</span>
+                                <span className="mt-1">{data.sellingDeliveryFees} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Commission</span>
+                                <span className="mt-1">{data.sellingCommission} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Frais Paypal</span>
+                                <span className="mt-1">{data.paypalFees} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Frais eBay</span>
+                                <span className="mt-1">{data.iebayFees} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Statut du paiement</span>
+                                <span className="mt-1">{data.paymentStatus}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Statut de la livraison</span>
+                                <span className="mt-1">{data.deliveryStatus}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Réception</span>
+                                <span className="mt-1">{data.isReceived}</span>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -345,13 +455,36 @@ export default function DetailPage() {
                 <TabsContent value="listing">
                     <Card className="mt-4">
                         <CardHeader><CardTitle>Informations de listing</CardTitle></CardHeader>
-                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <p><strong>CD&LP Prix :</strong> {data.cdlpListingPrice} €</p>
-                            <p><strong>CD&LP Statut :</strong> {data.cdlpListingStatus}</p>
-                            <p><strong>Discogs Prix :</strong> {data.discogsSellingPrice} €</p>
-                            <p><strong>Discogs Statut :</strong> {data.discogsSellingStatus}</p>
-                            <p><strong>eBay Statut :</strong> {data.ebayListingStatus}</p>
-                            <p><strong>Problèmes :</strong> {data.listingIssues}</p>
+                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">CD&LP Prix</span>
+                                <span className="mt-1">{data.cdlpListingPrice} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">CD&LP Statut</span>
+                                <span className="mt-1">{data.cdlpListingStatus}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Discogs Prix</span>
+                                <span className="mt-1">{data.discogsSellingPrice} €</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">Discogs Statut</span>
+                                <span className="mt-1">{data.discogsSellingStatus}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2">
+                                <span className="text-sm font-medium text-muted-foreground">eBay Statut</span>
+                                <span className="mt-1">{data.ebayListingStatus}</span>
+                            </div>
+
+                            <div className="flex flex-col border-b pb-2 sm:col-span-2 lg:col-span-3">
+                                <span className="text-sm font-medium text-muted-foreground">Problèmes</span>
+                                <span className="mt-1">{data.listingIssues}</span>
+                            </div>
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -359,21 +492,54 @@ export default function DetailPage() {
                 <TabsContent value="discogs">
                     <Card className="mt-4">
                         <CardHeader><CardTitle>Informations Discogs</CardTitle></CardHeader>
-                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                             {loadingDiscogs ? (
                                 <p>Chargement des données Discogs...</p>
                             ) : discogsData ? (
                                 <>
-                                    <div className="space-y-2">
-                                        <p><strong>Titre :</strong> {discogsData.title}</p>
-                                        <p><strong>Référence :</strong> {discogsData.catno}</p>
-                                        <p><strong>Pays :</strong> {discogsData.country}</p>
-                                        <p><strong>Année :</strong> {discogsData.year}</p>
-                                        <p><strong>Format :</strong> {discogsData.format?.join(", ")}</p>
-                                        <p><strong>Label :</strong> {discogsData.label?.join(", ")}</p>
-                                        <p><strong>Type :</strong> {discogsData.type}</p>
-                                        <p><strong>Genre :</strong> {discogsData.genre}</p>
-                                        <p><strong>Style :</strong> {discogsData.style?.join(", ")}</p>
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Titre</span>
+                                        <span className="mt-1">{discogsData.title}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Référence</span>
+                                        <span className="mt-1">{discogsData.catno}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Pays</span>
+                                        <span className="mt-1">{discogsData.country}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Année</span>
+                                        <span className="mt-1">{discogsData.year}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Format</span>
+                                        <span className="mt-1">{discogsData.format?.join(", ")}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Label</span>
+                                        <span className="mt-1">{discogsData.label?.join(", ")}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Type</span>
+                                        <span className="mt-1">{discogsData.type}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2">
+                                        <span className="text-sm font-medium text-muted-foreground">Genre</span>
+                                        <span className="mt-1">{discogsData.genre}</span>
+                                    </div>
+
+                                    <div className="flex flex-col border-b pb-2 sm:col-span-2 lg:col-span-3">
+                                        <span className="text-sm font-medium text-muted-foreground">Style</span>
+                                        <span className="mt-1">{discogsData.style?.join(", ")}</span>
                                     </div>
                                 </>
                             ) : (
