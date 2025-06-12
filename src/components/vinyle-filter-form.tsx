@@ -31,7 +31,6 @@ export const VinyleFiltersForm = ({
     onDateChange: (name: string, date: Date | null) => void;
     filtersInit: any;
 }) => {
-    const supports = filtersInit.supports ?? [];
     const sellingStatuses = filtersInit.sellingStatuses ?? [];
 
     return (

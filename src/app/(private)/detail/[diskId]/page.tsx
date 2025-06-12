@@ -132,7 +132,9 @@ export default function DetailPage() {
     };
 
     const handleCancel = () => {
-        reset();
+        if (data) {
+            reset(data);
+        }
         setIsEditing(false);
     };
 

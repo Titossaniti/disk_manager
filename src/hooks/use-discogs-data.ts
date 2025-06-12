@@ -1,14 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 
-const extractYear = (cy: string | null | undefined): string | undefined => {
-    const match = cy?.match(/\d{2}$/);
-    return match ? `19${match[0]}` : undefined;
-};
-
 export const useDiscogsData = ({
                                    artist,
                                    title,
-                                   countryYear,
                                    label,
                                    ref,
                                }: {
@@ -18,10 +12,9 @@ export const useDiscogsData = ({
     label?: string;
     ref?: string;
 }) => {
-    const year = extractYear(countryYear);
 
     return useQuery({
-        queryKey: ["discogs", artist, title, label, ref, year],
+        queryKey: ["discogs", artist, title, label, ref ],
         queryFn: async () => {
             if (!artist || !title) return null;
 
@@ -33,7 +26,6 @@ export const useDiscogsData = ({
             url.searchParams.set("type", "release");
             url.searchParams.set("format", "Vinyl");
             url.searchParams.set("per_page", "1");
-            if (year) url.searchParams.set("year", year);
             url.searchParams.set("token", token ?? "");
 
             const res = await fetch(url.toString());
