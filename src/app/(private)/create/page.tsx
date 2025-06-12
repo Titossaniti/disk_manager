@@ -66,7 +66,6 @@ export default function AddVinyleForm() {
             setValue("ref", d.labels?.[0]?.catno || "");
             setValue("genre", d.genres?.[0] || "");
             setValue("support", d.formats?.[0]?.name || "");
-            setValue("notes", d.notes || "");
         } catch (err) {
             console.error("Erreur Discogs:", err);
             toast.error("Erreur lors du chargement des données depuis Discogs.");
@@ -120,7 +119,7 @@ export default function AddVinyleForm() {
                 <Card className="">
                     <CardContent className="space-y-2">
                         <CardTitle className="text-sm font-medium">Préremplir le formulaire</CardTitle>
-                        <CardDescription>Recherchez et selectionnez un vinyle sur Discogs pour préremplir les
+                        <CardDescription>Recherchez et sélectionnez un vinyle sur Discogs pour préremplir les
                             champs du formulaire.
                         </CardDescription>
                         <DiscogsSearch
@@ -133,7 +132,6 @@ export default function AddVinyleForm() {
                                 setValue("ref", "");
                                 setValue("genre", "");
                                 setValue("support", "");
-                                setValue("notes", "");
                             }}
                         />
                     </CardContent>

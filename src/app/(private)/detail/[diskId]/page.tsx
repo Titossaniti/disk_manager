@@ -155,16 +155,6 @@ export default function DetailPage() {
 
     if (isError || !data) return <div className="p-4 text-red-600">Erreur de chargement. Il se peut que le disque recherché n'existe pas.</div>;
 
-    const contentGridClasses = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6";
-
-    function Field({ label, value }: { label: string; value?: string | number }) {
-        return (
-            <div className="flex flex-col border-b pb-2">
-                <span className="text-sm font-medium text-muted-foreground">{label}</span>
-                <span className="mt-1 whitespace-pre-line">{value || "—"}</span>
-            </div>
-        );
-    }
 
     return (
         <div className="p-4 md:p-6 space-y-6">
