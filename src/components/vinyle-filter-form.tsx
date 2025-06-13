@@ -2,12 +2,9 @@
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-    Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
-} from "@/components/ui/select";
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { format } from "date-fns";
 import MultipleSelector from "@/components/ui/multiple-selector";
 import {Euro} from "lucide-react";
 import React from "react";
@@ -25,16 +22,29 @@ export const VinyleFiltersForm = ({
                                       onChange,
                                       onDateChange,
                                       filtersInit,
+                                      onSubmit,
                                   }: {
     filters: any;
     onChange: (name: string, value: any) => void;
     onDateChange: (name: string, date: Date | null) => void;
     filtersInit: any;
+    onSubmit?: () => void,
 }) => {
     const sellingStatuses = filtersInit.sellingStatuses ?? [];
 
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            if (onSubmit) onSubmit();
+        }
+    };
+
     return (
-        <div className="space-y-6 rounded-lg shadow p-4 bg-muted">
+        <form
+            onKeyDown={handleKeyDown}
+            className="space-y-6 rounded-lg shadow p-4 bg-muted"
+        >
+        {/*<div className="space-y-6 rounded-lg shadow p-4 bg-muted">*/}
 
             {/* Ligne 1 : artiste - titre - pressage */}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -230,7 +240,7 @@ export const VinyleFiltersForm = ({
                     </div>
                 ))}
             </div>
-        </div>
+        </form>
 
     );
 };

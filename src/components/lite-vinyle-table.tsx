@@ -106,7 +106,27 @@ const LiteVinylesTable = () => {
     }, [searchParams]);
 
     const { data: filtersInit } = useTableFiltersValues();
-    const [filters, setFilters] = useState({ ...defaultFilters });
+    const [filters, setFilters] = useState(defaultFilters);
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const newFilters = { ...defaultFilters };
+
+        for (const [key, value] of params.entries()) {
+            if (key in defaultFilters) {
+                if (value === "true") newFilters[key] = true;
+                else if (value === "false") newFilters[key] = false;
+                else if (!isNaN(Number(value)) && key.endsWith("Min") || key.endsWith("Max")) newFilters[key] = Number(value);
+                else newFilters[key] = value;
+            } else if (key === "sellingStatuses") {
+                newFilters["sellingStatus"] = params.getAll("sellingStatuses");
+            }
+        }
+
+        setFilters(newFilters);
+        setAppliedFilters(newFilters);
+    }, []);
+
     const [appliedFilters, setAppliedFilters] = useState({ ...defaultFilters });
     const [page, setPage] = useState(0);
     const [size, setSize] = useState(50);
@@ -146,8 +166,30 @@ const LiteVinylesTable = () => {
 
     const handleChange = (name: string, value: any) => setFilters((prev) => ({ ...prev, [name]: value }));
     const handleDateChange = (name: string, date: Date | null) => setFilters((prev) => ({ ...prev, [name]: date }));
-    const applyFilters = () => { setPage(0); setAppliedFilters({ ...filters }); };
-    const resetFilters = () => { setPage(0); setFilters({ ...defaultFilters }); setAppliedFilters({ ...defaultFilters }); };
+    const applyFilters = () => {
+        setPage(0);
+        setAppliedFilters({ ...filters });
+
+        const params = new URLSearchParams();
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value === null || value === undefined || value === "") return;
+            if (Array.isArray(value)) {
+                value.forEach(v => params.append(`${key}s`, v));
+            } else {
+                params.set(key, value.toString());
+            }
+        });
+
+        const newUrl = `${window.location.pathname}?${params.toString()}`;
+        router.replace(newUrl);
+    };
+
+    const resetFilters = () => {
+        setPage(0);
+        setFilters({ ...defaultFilters });
+        setAppliedFilters({ ...defaultFilters });
+        router.replace(window.location.pathname);
+    };
 
     if (isLoading || !data || !filtersInit)
         return (
@@ -186,8 +228,12 @@ const LiteVinylesTable = () => {
 
     return (
         <div className="p-4 space-y-6">
-            <VinyleFiltersForm filters={filters} onChange={handleChange} onDateChange={handleDateChange}
-                               filtersInit={filtersInit}/>
+            <VinyleFiltersForm filters={filters}
+                               onChange={handleChange}
+                               onDateChange={handleDateChange}
+                               filtersInit={filtersInit}
+                               onSubmit={applyFilters}
+            />
 
             <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={resetFilters} className={"cursor-pointer"}>Réinitialiser</Button>
