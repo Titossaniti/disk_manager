@@ -111,7 +111,7 @@ export default function AddVinyleForm() {
                 toast.error("Veuillez corriger les erreurs dans le formulaire.");
             })} className="p-6 space-y-6">
                 <div className="space-y-2">
-                    <BackButton/>
+                    <BackButton fallbackHref="/home"/>
                     <h1 className="text-2xl font-bold tracking-tight">Ajouter un nouveau disque</h1>
                     <p className="text-muted-foreground">Complétez les champs du formulaire et validez pour ajouter
                         votre disque à la base de données !</p>

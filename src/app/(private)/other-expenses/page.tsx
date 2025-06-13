@@ -147,7 +147,7 @@ export default function OtherExpensesPage() {
 
     return (
         <div className="space-y-6 p-6">
-            <BackButton/>
+            <BackButton fallbackHref="/home"/>
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
 
                 <div>

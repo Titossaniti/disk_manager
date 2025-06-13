@@ -159,12 +159,11 @@ export default function DetailPage() {
     return (
         <div className="p-4 md:p-6 space-y-6">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                {/* Retour en haut sur mobile */}
+
                 <div className="self-start">
-                    <BackButton />
+                    <BackButton fallbackHref="/vinyles"/>
                 </div>
 
-                {/* Modifier + Supprimer côte à côte */}
                 {!isEditing ? (
                     <div className="flex gap-2 self-start sm:self-auto">
                         <Button onClick={handleEdit} variant="outline">

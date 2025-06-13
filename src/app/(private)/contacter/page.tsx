@@ -17,7 +17,7 @@ export default function PrivateContactPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <BackButton/>
+            <BackButton fallbackHref="/home"/>
             <div className="flex justify-center">
                 <Card className="w-full max-w-2xl">
                     <CardHeader className="text-center">

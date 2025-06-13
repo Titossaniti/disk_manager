@@ -23,7 +23,7 @@ export default function VinylesPage() {
 
     return (
         <div className="space-y-6 p-6">
-            <BackButton/>
+            <BackButton fallbackHref="/home"/>
             <div className="space-y-1">
                 <h1 className="text-2xl font-bold tracking-tight">Mes disques</h1>
                 <p className="text-muted-foreground">Filtrez, triez et explorez les vinyles.</p>

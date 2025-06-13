@@ -40,7 +40,7 @@ export default function ProfilePage() {
 
     return (
         <div className="p-6 space-y-6">
-            <BackButton/>
+            <BackButton fallbackHref="/home"/>
             <h1 className="text-2xl font-semibold">Modifiez les informations de votre profil</h1>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
