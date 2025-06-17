@@ -17,13 +17,13 @@ import {ChevronsUpDown, Check, Loader2, Delete} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
+import {toast} from "sonner";
 
 type ComboboxProps = {
     label: string
     fetchUrl: string
     value: string
     onValueChange: (v: string) => void
-    strictList?: boolean
 }
 
 export function CustomCombobox({
@@ -31,7 +31,6 @@ export function CustomCombobox({
                              fetchUrl,
                              value,
                              onValueChange,
-                             strictList = false,
                          }: ComboboxProps) {
     const [open, setOpen] = useState(false)
     const [input, setInput] = useState("")
@@ -42,7 +41,7 @@ export function CustomCombobox({
 
     useEffect(() => {
         if (!input) return
-        if (strictList && input.length < 3) return
+        if (input.length < 1) return
 
         const key = `${fetchUrl}::${input.toLowerCase()}`
         if (cacheRef.current.has(key)) {
@@ -53,9 +52,10 @@ export function CustomCombobox({
         const fetchOptions = async () => {
             setLoading(true)
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${fetchUrl}`, {
-                    credentials: "include",
-                })
+                const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}${fetchUrl}`)
+                url.searchParams.set("q", input)
+
+                const res = await fetch(url.toString(), { credentials: "include" })
 
                 const text = await res.text()
                 if (!text) {
@@ -64,14 +64,12 @@ export function CustomCombobox({
                 }
 
                 const data = JSON.parse(text)
-                const filtered = data.filter((item: string) =>
-                    item.toLowerCase().includes(input.toLowerCase())
-                )
 
-                cacheRef.current.set(key, filtered)
-                setOptions(filtered)
+                cacheRef.current.set(key, data)
+                setOptions(data)
             } catch (e) {
                 console.error("Erreur chargement options:", e)
+                toast.error("Erreur dans le chargement des options.")
                 setOptions([])
             } finally {
                 setLoading(false)
@@ -79,7 +77,7 @@ export function CustomCombobox({
         }
 
         fetchOptions()
-    }, [input, fetchUrl, strictList])
+    }, [input, fetchUrl])
 
     return (
         <div className="relative w-[220px]">
@@ -123,7 +121,7 @@ export function CustomCombobox({
                             )}
                             <CommandEmpty>Aucun résultat.</CommandEmpty>
                             <CommandGroup>
-                                {!strictList && input.length >= 3 && (
+                                {input.length >= 1 && (
                                     <CommandItem onSelect={() => { onValueChange(input); setOpen(false) }}>
                                         {input}
                                         <Check className="ml-auto opacity-50" />

@@ -30,7 +30,6 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { CustomCombobox } from "@/components/ui/custom-combobox"
 import {Separator} from "@/components/ui/separator";
 import {useIsMobile} from "@/hooks/use-mobile";
-import {SeparatorVertical} from "lucide-react";
 
 type MonthlyStat = {
     year: number
@@ -275,7 +274,6 @@ export default function FilteredStatsChart() {
                             fetchUrl="/vinyles/artists"
                             value={artist}
                             onValueChange={setArtist}
-                            strictList
                         />
                         <CustomCombobox
                             label="Lieu d’achat"

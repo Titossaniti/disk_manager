@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { format } from "date-fns";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useSellingStatuses } from "@/hooks/use-selling-statuses";
 
 import { VinyleFiltersForm } from "./vinyle-filter-form";
 import { TablePagination } from "@/components/table-pagination";
@@ -105,6 +106,7 @@ const LiteVinylesTable = () => {
         setEditableMode(isEditMode);
     }, [searchParams]);
 
+    const { data: sellingStatusOptions } = useSellingStatuses();
     const { data: filtersInit } = useTableFiltersValues();
     const [filters, setFilters] = useState(defaultFilters);
 
@@ -231,7 +233,7 @@ const LiteVinylesTable = () => {
             <VinyleFiltersForm filters={filters}
                                onChange={handleChange}
                                onDateChange={handleDateChange}
-                               filtersInit={filtersInit}
+                               filtersInit={{ ...filtersInit, sellingStatuses: sellingStatusOptions ?? [] }}
                                onSubmit={applyFilters}
             />
 
@@ -439,21 +441,22 @@ const LiteVinylesTable = () => {
                                     <TableCell>
                                         {editableMode ? (
                                             <EditableSelectCell
-                                                initialValue={updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus}
+                                                initialValue={updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatusLabel}
                                                 field="sellingStatus"
                                                 id={disk.id}
-                                                options={filtersInit.sellingStatuses}
+                                                options={sellingStatusOptions?.map((s) => s.name) ?? []}
+                                                sellingStatusOptions={sellingStatusOptions}
                                                 onVinyleUpdated={(updated) =>
                                                     setUpdatedRows((prev) => ({
                                                         ...prev,
-                                                        [disk.id]: {...prev[disk.id], ...updated},
+                                                        [disk.id]: { ...prev[disk.id], ...updated },
                                                     }))
                                                 }
                                             />
                                         ) : (
                                             <Badge
-                                                className={sellingStatusBadgeColor(updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus)}>
-                                                {updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatus}
+                                                className={sellingStatusBadgeColor(updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatusLabel)}>
+                                                {updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatusLabel}
                                             </Badge>
                                         )}
                                     </TableCell>

@@ -30,7 +30,8 @@ export const VinyleFiltersForm = ({
     filtersInit: any;
     onSubmit?: () => void,
 }) => {
-    const sellingStatuses = filtersInit.sellingStatuses ?? [];
+
+    const sellingStatuses = (filtersInit.sellingStatuses ?? []).filter(Boolean);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter") {
@@ -44,7 +45,6 @@ export const VinyleFiltersForm = ({
             onKeyDown={handleKeyDown}
             className="space-y-6 rounded-lg shadow p-4 bg-muted"
         >
-        {/*<div className="space-y-6 rounded-lg shadow p-4 bg-muted">*/}
 
             {/* Ligne 1 : artiste - titre - pressage */}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -101,10 +101,10 @@ export const VinyleFiltersForm = ({
                 <div className="relative space-y-1">
                     <Label>Statuts de vente</Label>
                     <MultipleSelector
-                        options={sellingStatuses.map((status) => ({
-                            key: status,
-                            label: status,
-                            value: status,
+                        options={sellingStatuses.map((status: { id: number; label: string }) => ({
+                            key: String(status.id),
+                            label: status.label,
+                            value: status.label,
                         }))}
                         value={filters.sellingStatus.map((v: string) => ({ label: v, value: v }))}
                         onChange={(values) => onChange("sellingStatus", values.map(v => v.value))}
