@@ -444,7 +444,7 @@ const LiteVinylesTable = () => {
                                                 initialValue={updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatusLabel}
                                                 field="sellingStatus"
                                                 id={disk.id}
-                                                options={sellingStatusOptions?.map((s) => s.name) ?? []}
+                                                options={sellingStatusOptions?.map((s) => ({ id: s.id, label: s.label })) ?? []}
                                                 sellingStatusOptions={sellingStatusOptions}
                                                 onVinyleUpdated={(updated) =>
                                                     setUpdatedRows((prev) => ({
@@ -455,9 +455,19 @@ const LiteVinylesTable = () => {
                                             />
                                         ) : (
                                             <Badge
-                                                className={sellingStatusBadgeColor(updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatusLabel)}>
-                                                {updatedRows[disk.id]?.sellingStatus ?? disk.sellingStatusLabel}
+                                                className={sellingStatusBadgeColor(
+                                                    typeof updatedRows[disk.id]?.sellingStatus === "string"
+                                                        ? updatedRows[disk.id]?.sellingStatus
+                                                        : updatedRows[disk.id]?.sellingStatus?.label ?? disk.sellingStatusLabel
+                                                )}
+                                            >
+                                                {
+                                                    typeof updatedRows[disk.id]?.sellingStatus === "string"
+                                                        ? updatedRows[disk.id]?.sellingStatus
+                                                        : updatedRows[disk.id]?.sellingStatus?.label ?? disk.sellingStatusLabel
+                                                }
                                             </Badge>
+
                                         )}
                                     </TableCell>
 
