@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from "react";
 import axios from "axios";
 import { useDebounce } from "use-debounce";
 import {
@@ -33,7 +33,7 @@ type Props = {
     onReset?: () => void;
 };
 
-export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
+export const DiscogsSearch = forwardRef(({ onSelect, onReset }: Props, ref) => {
     const [query, setQuery] = useState("");
     const [debouncedQuery] = useDebounce(query, 400);
     const [results, setResults] = useState<DiscogsResult[]>([]);
@@ -45,6 +45,10 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [hasSelected, setHasSelected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+
+    useImperativeHandle(ref, () => ({
+        resetSearch: handleReset,
+    }));
 
     useEffect(() => {
         const searchDiscogs = async () => {
@@ -257,4 +261,6 @@ export const DiscogsSearch = ({ onSelect, onReset }: Props) => {
             )}
         </div>
     );
-};
+});
+
+DiscogsSearch.displayName = "DiscogsSearch";

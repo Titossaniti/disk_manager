@@ -1,7 +1,6 @@
 "use client";
 
-import React from "react";
-import { useRouter } from "next/navigation";
+import React, {useRef} from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { toast } from "sonner";
@@ -25,7 +24,8 @@ type VinyleFormData = z.infer<typeof vinyleSchema>;
 
 
 export default function AddVinyleForm() {
-    const router = useRouter();
+
+    const discogsRef = useRef<{ resetSearch: () => void }>(null);
     const queryClient = useQueryClient();
 
     const form = useForm<VinyleFormData>({
@@ -40,6 +40,7 @@ export default function AddVinyleForm() {
         handleSubmit,
         setValue,
         watch,
+        reset,
         formState: { errors, isSubmitting },
     } = form;
 
@@ -78,12 +79,13 @@ export default function AddVinyleForm() {
             const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/vinyles`, newDisk, { withCredentials: true });
             return data;
         },
-        onSuccess: (createdDisk) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["vinyles"] });
+            reset();
+            discogsRef.current?.resetSearch();
             toast.success("Disque ajouté avec succès !");
-            const formattedArtist = createdDisk.artist.replaceAll(" ", "-").replaceAll("/", "-").replaceAll("\\", "-");
-            const formattedTitle = createdDisk.title.replaceAll(" ", "-").replaceAll("/", "-").replaceAll("\\", "-");
-            router.push(`/detail/${createdDisk.id}-${formattedArtist}-${formattedTitle}`);
+            setValue("artist", "");
+            window.scrollTo({ top: 0, behavior: "smooth" });
         },
         onError: (error: any) => {
             toast.error(error.response?.data?.message || "Erreur inconnue lors de la création du disque.");
@@ -123,6 +125,7 @@ export default function AddVinyleForm() {
                             champs du formulaire.
                         </CardDescription>
                         <DiscogsSearch
+                            ref={discogsRef}
                             onSelect={handleDiscogsSelect}
                             onReset={() => {
                                 setValue("artist", "");

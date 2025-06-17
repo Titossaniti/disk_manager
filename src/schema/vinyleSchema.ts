@@ -12,29 +12,40 @@ const flexibleNumber = () =>
         z.number().nonnegative("Doit être positif")
     );
 
+const getStatusLabelById = (id: number | undefined): string | undefined => {
+    switch (id) {
+        case 1: return "réceptionné";
+        case 2: return "à mettre en vente";
+        case 3: return "pas encore en vente";
+        case 4: return "en vente";
+        case 5: return "vendu";
+        default: return undefined;
+    }
+};
+
 export const vinyleSchema = z.object({
-    // Required fields
+    // Champs requis
     artist: z.string().min(1, "Champ requis"),
     title: z.string().min(1, "Champ requis"),
     support: z.string().min(1, "Champ requis"),
     countryYear: z.string().min(1, "Champ requis"),
     buyPlace: z.string().min(1, "Champ requis"),
     netBuyPrice: flexibleNumber(),
-    buyDate: z.string({ required_error: "Champ requis", invalid_type_error: "La date doit être une chaîne"}).regex(dateFormat, "Format attendu : yyyy-MM-dd"),
-    // sellingStatus: z.string().min(1, "Champ requis"),
+    buyDate: z.string({ required_error: "Champ requis", invalid_type_error: "La date doit être une chaîne" }).regex(dateFormat, "Date requise ou invalide"),
     sellingStatusId: z.number({
         required_error: "Champ requis",
-        invalid_type_error: "Statut de vente invalide"
+        invalid_type_error: "Statut de vente requis ou invalide"
     }).min(1, "Champ requis"),
     diskCondition: z.string().min(1, "Champ requis"),
-    // Optional fields
+
+    // Champs optionnels
     label: z.string().nullable().optional(),
     genre: z.string().nullable().optional(),
     notes: z.string().nullable().optional(),
     sellingPlace: z.string().nullable().optional(),
     sellingDate: z
         .union([
-            z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Format attendu : yyyy-MM-dd"),
+            z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date nécessaire"),
             z.literal(""),
             z.null()
         ])
@@ -56,18 +67,12 @@ export const vinyleSchema = z.object({
     discogsSellingStatus: z.string().nullable().optional(),
     listingIssues: z.string().nullable().optional(),
     ebayListingStatus: z.string().nullable().optional(),
-}).refine(
-    (data) => {
-        if (!data.sellingDate || data.sellingDate === "") return true;
-        return new Date(data.sellingDate) >= new Date(data.buyDate);
-    },
-    {
-        message: "La date de vente ne peut pas être antérieure à la date d'achat.",
-        path: ["sellingDate"],
-    }
-).superRefine((data, ctx) => {
-    const isVendu = data.sellingStatus === "vendu";
-    const isPasEnVente = data.sellingStatus === "pas encore en vente" || data.sellingStatus === "en vente";
+}).superRefine((data, ctx) => {
+    const statusLabel = getStatusLabelById(data.sellingStatusId);
+
+    if (!statusLabel) return;
+
+    const isVendu = statusLabel === "vendu";
 
     if (isVendu) {
         if (!data.sellingDate || data.sellingDate === "") {
@@ -85,14 +90,14 @@ export const vinyleSchema = z.object({
                 message: "Le prix de vente est requis si le disque est indiqué comme vendu.",
             });
         }
-    }
 
-    if (isPasEnVente) {
+    } else {
+        // cas contraire : tout ce qui n’est pas "vendu"
         if (data.sellingDate && data.sellingDate !== "") {
             ctx.addIssue({
                 path: ["sellingDate"],
                 code: z.ZodIssueCode.custom,
-                message: "La date de vente ne doit pas être remplie si le disque n'est pas encore vendu.",
+                message: "La date de vente ne doit pas être remplie si le disque n'est pas vendu.",
             });
         }
 
@@ -100,15 +105,15 @@ export const vinyleSchema = z.object({
             ctx.addIssue({
                 path: ["netSellingPrice"],
                 code: z.ZodIssueCode.custom,
-                message: "Le prix de vente ne doit pas être rempli si le disque n'est pas encore vendu.",
+                message: "Le prix de vente ne doit pas être rempli si le disque n'est pas vendu.",
             });
         }
 
-        if (data.sellingPlace && data.sellingPlace !== "") {
+        if (data.sellingPlace && data.sellingPlace.trim() !== "") {
             ctx.addIssue({
                 path: ["sellingPlace"],
                 code: z.ZodIssueCode.custom,
-                message: "Le lieu de vente ne doit pas être rempli si le disque n'est pas encore vendu.",
+                message: "Le lieu de vente ne doit pas être rempli si le disque n'est pas vendu.",
             });
         }
     }

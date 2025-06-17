@@ -85,7 +85,7 @@ export const VinyleFormFields = ({
                                 notes: "Notes",
                                 buyDate: "Date d'achat",
                                 buyPlace: "Lieu d'achat",
-                                sellingStatus: "Statut de vente",
+                                sellingStatusId: "Statut de vente",
                                 sellingPlace: "Lieu de vente",
                                 sellingDate: "Date de vente",
                                 paymentStatus: "Statut du paiement",
