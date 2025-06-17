@@ -283,10 +283,10 @@ export default function DetailPage() {
                                 <div className="flex flex-col border-b pb-2">
                                     <span className="text-sm font-medium text-muted-foreground">Statut</span>
                                     <span className="mt-1">
-                                    <Badge className={sellingStatusBadgeColor(data.sellingStatus)}>
-                                        {data.sellingStatus || "?"}
-                                    </Badge>
-                                </span>
+                                        <Badge className={sellingStatusBadgeColor(data.sellingStatus?.label)}>
+                                            {data.sellingStatus?.label || "?"}
+                                        </Badge>
+                                    </span>
                                 </div>
 
                                 <div className="flex flex-col border-b pb-2">

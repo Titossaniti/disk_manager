@@ -21,7 +21,11 @@ export const vinyleSchema = z.object({
     buyPlace: z.string().min(1, "Champ requis"),
     netBuyPrice: flexibleNumber(),
     buyDate: z.string({ required_error: "Champ requis", invalid_type_error: "La date doit être une chaîne"}).regex(dateFormat, "Format attendu : yyyy-MM-dd"),
-    sellingStatus: z.string().min(1, "Champ requis"),
+    // sellingStatus: z.string().min(1, "Champ requis"),
+    sellingStatusId: z.number({
+        required_error: "Champ requis",
+        invalid_type_error: "Statut de vente invalide"
+    }).min(1, "Champ requis"),
     diskCondition: z.string().min(1, "Champ requis"),
     // Optional fields
     label: z.string().nullable().optional(),
@@ -120,7 +124,7 @@ export const requiredFields: (keyof VinyleFormData)[] = [
     "buyPlace",
     "netBuyPrice",
     "buyDate",
-    "sellingStatus",
+    "sellingStatusId",
     "diskCondition",
 ];
 
@@ -139,7 +143,7 @@ export const orderedFields: (keyof VinyleFormData)[] = [
     "buyPlace",
     "netBuyPrice",
     "buyDeliveryFees",
-    "sellingStatus",
+    "sellingStatusId",
     "sellingPlace",
     "sellingDate",
     "netSellingPrice",

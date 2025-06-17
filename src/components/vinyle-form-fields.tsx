@@ -24,6 +24,10 @@ import {DateTimePicker} from "@/components/ui/datetime-picker";
 import { fr } from "date-fns/locale"
 import {format} from "date-fns";
 
+type SellingStatusOption = {
+    id: number;
+    label: string;
+};
 
 type Props = {
     register: UseFormRegister<VinyleFormData>
@@ -32,7 +36,7 @@ type Props = {
     setValue: UseFormSetValue<VinyleFormData>
     filtersInit: {
         supports: string[]
-        sellingStatuses: string[]
+        sellingStatuses: SellingStatusOption[]
     }
 }
 
@@ -111,18 +115,18 @@ export const VinyleFormFields = ({
                                 ))}
                             </SelectContent>
                         </Select>
-                    ) : key === "sellingStatus" ? (
+                    ) : key === "sellingStatusId" ? (
                         <Select
-                            value={watch("sellingStatus")}
-                            onValueChange={(v) => setValue("sellingStatus", v)}
+                            value={watch("sellingStatusId")?.toString()}
+                            onValueChange={(v) => setValue("sellingStatusId", Number(v))}
                         >
                             <SelectTrigger className="w-full">
                                 <SelectValue placeholder="Choisir..." />
                             </SelectTrigger>
                             <SelectContent>
-                                {filtersInit.sellingStatuses.map((s) => (
-                                    <SelectItem key={s} value={s}>
-                                        {s}
+                                {filtersInit.sellingStatuses.map((status) => (
+                                    <SelectItem key={status.id} value={status.id.toString()}>
+                                        {status.label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
