@@ -37,20 +37,3 @@ export async function getSession(): Promise<SessionUser | null> {
         return null
     }
 }
-
-/**
- * Déconnecte l'utilisateur côté serveur et redirige.
- */
-// export async function logoutServerSide(): Promise<void> {
-//     const jwt = cookies().get("jwt")?.value
-//     if (jwt) {
-//         await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/logout`, {
-//             method: "POST",
-//             headers: {
-//                 Cookie: `jwt=${jwt}`,
-//             },
-//         })
-//     }
-//
-//     redirect("/login")
-// }
