@@ -43,7 +43,6 @@ export default function AddVinyleForm() {
         reset,
         formState: { errors, isSubmitting },
     } = form;
-
     const { data: filtersInit, isLoading: isLoadingFilters } = useQuery({
         queryKey: ["vinyles", "filters", "initialization"],
         queryFn: async () => {
