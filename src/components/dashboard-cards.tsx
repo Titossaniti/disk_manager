@@ -30,7 +30,7 @@ const DashboardCard = ({ title, description, icon, imageSrc, route }: DashboardC
                     ) : (
                         <Button
                             className="rounded-full h-24 w-24 p-0 cursor-pointer border border-2 hover:bg-gray-400"
-                            variant="icon"
+                            variant="outline"
                         >
                             {icon}
                         </Button>

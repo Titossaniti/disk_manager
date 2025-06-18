@@ -11,61 +11,56 @@ import {
     CardContent, CardDescription, CardTitle,
     Skeleton,
 } from "@/components/ui";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {VinyleFormFields} from "@/components/vinyle-form-fields";
-import {orderedFields, vinyleSchema} from "@/schema/vinyleSchema";
+import { vinyleSchema, type VinyleFormData } from "@/schema/vinyleSchema"
 import {DiscogsSearch} from "@/components/discogs-search";
 import {Loader2} from "lucide-react";
 import BackButton from "@/components/back-button";
 
-type VinyleFormData = z.infer<typeof vinyleSchema>;
-
+const defaultValues: VinyleFormData = {
+    artist: "",
+    title: "",
+    support: "",
+    genre: "",
+    label: "",
+    countryYear: "",
+    ref: "",
+    diskCondition: "",
+    scanStatus: "",
+    notes: "",
+    buyDate: "",
+    buyPlace: "",
+    netBuyPrice: 0,
+    buyDeliveryFees: 0,
+    sellingStatusId: 2,
+    sellingPlace: "",
+    sellingDate: "",
+    netSellingPrice: 0,
+    sellingDeliveryFees: 0,
+    sellingCommission: 0,
+    paypalFees: 0,
+    iebayFees: 0,
+    paymentStatus: "",
+    deliveryStatus: "",
+    isReceived: "",
+    cdlpListingPrice: 0,
+    cdlpListingStatus: "",
+    discogsSellingPrice: 0,
+    discogsSellingStatus: "",
+    ebayListingStatus: "",
+    listingIssues: "",
+};
 
 export default function AddVinyleForm() {
 
     const discogsRef = useRef<{ resetSearch: () => void }>(null);
     const queryClient = useQueryClient();
 
-    const defaultValues: VinyleFormData = {
-        artist: "",
-        title: "",
-        support: "",
-        genre: "",
-        label: "",
-        countryYear: "",
-        ref: "",
-        diskCondition: "",
-        scanStatus: "",
-        notes: "",
-        buyDate: "",
-        buyPlace: "",
-        netBuyPrice: 0,
-        buyDeliveryFees: 0,
-        sellingStatusId: 2,
-        sellingPlace: "",
-        sellingDate: "",
-        netSellingPrice: 0,
-        sellingDeliveryFees: 0,
-        sellingCommission: 0,
-        paypalFees: 0,
-        iebayFees: 0,
-        paymentStatus: "",
-        deliveryStatus: "",
-        isReceived: "",
-        cdlpListingPrice: 0,
-        cdlpListingStatus: "",
-        discogsSellingPrice: 0,
-        discogsSellingStatus: "",
-        ebayListingStatus: "",
-        listingIssues: "",
-    };
-
-
     const form = useForm<VinyleFormData>({
-        resolver: zodResolver(vinyleSchema),
-        defaultValues
+        resolver: zodResolver(vinyleSchema) as Resolver<VinyleFormData>,
+        defaultValues,
     });
 
     const {

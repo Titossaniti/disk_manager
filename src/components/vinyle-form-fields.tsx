@@ -24,6 +24,41 @@ import {DateTimePicker} from "@/components/ui/datetime-picker";
 import { fr } from "date-fns/locale"
 import {format} from "date-fns";
 
+const fieldLabels: Partial<Record<keyof VinyleFormData, string>> = {
+    artist: "Artiste",
+    title: "Titre",
+    support: "Support",
+    genre: "Genre",
+    label: "Label",
+    countryYear: "Pressage",
+    ref: "Référence du disque",
+    diskCondition: "État du disque",
+    scanStatus: "État du scan",
+    notes: "Notes",
+    buyDate: "Date d'achat",
+    buyPlace: "Lieu d'achat",
+    sellingStatusId: "Statut de vente",
+    sellingPlace: "Lieu de vente",
+    sellingDate: "Date de vente",
+    paymentStatus: "Statut du paiement",
+    deliveryStatus: "État de la livraison",
+    isReceived: "État de la réception",
+    cdlpListingStatus: "Statut de l'annonce CD&LP",
+    discogsSellingStatus: "Statut de l'annonce Discogs",
+    ebayListingStatus: "Statut de l'annonce eBay",
+    listingIssues: "Problèmes rencontrés",
+    buyDeliveryFees: "Frais de livraison d'achat",
+    netBuyPrice: "Prix d'achat",
+    netSellingPrice: "Prix de vente",
+    sellingCommission: "Commission du site de vente",
+    paypalFees: "Frais Paypal",
+    iebayFees: "Frais ieBay",
+    sellingDeliveryFees: "Frais de livraison de vente",
+    cdlpListingPrice: "Prix CD&LP",
+    discogsSellingPrice: "Prix Discogs",
+}
+
+
 type SellingStatusOption = {
     id: number;
     label: string;
@@ -47,6 +82,7 @@ export const VinyleFormFields = ({
                                      setValue,
                                      filtersInit,
                                  }: Props) => {
+
     return (
         <>
             {orderedFields.map((key) => (
@@ -55,48 +91,10 @@ export const VinyleFormFields = ({
                         {requiredFields.includes(key) && (
                             <span className="text-red-500">*</span>
                         )}
-                        {key.includes("Price") ||
-                        key.includes("Fees") ||
-                        key.includes("Commission") ? (
-                            <>
-                                {key === "netBuyPrice" && "Prix d'achat"}
-                                {key === "buyDeliveryFees" && "Frais de livraison d'achat"}
-                                {key === "netSellingPrice" && "Prix de vente"}
-                                {key === "sellingCommission" && "Commission du site de vente"}
-                                {key === "paypalFees" && "Frais Paypal"}
-                                {key === "iebayFees" && "Frais ieBay"}
-                                {key === "sellingDeliveryFees" &&
-                                    "Frais de livraison de vente"}
-                                {key === "cdlpListingPrice" && "Prix CD&LP"}
-                                {key === "discogsSellingPrice" && "Prix Discogs"}{" "}
-                                <Euro className="w-4 h-4 text-muted-foreground" />
-                            </>
-                        ) : (
-                            {
-                                artist: "Artiste",
-                                title: "Titre",
-                                support: "Support",
-                                genre: "Genre",
-                                label: "Label",
-                                countryYear: "Pressage",
-                                ref: "Référence du disque",
-                                diskCondition: "État du disque",
-                                scanStatus: "État du scan",
-                                notes: "Notes",
-                                buyDate: "Date d'achat",
-                                buyPlace: "Lieu d'achat",
-                                sellingStatusId: "Statut de vente",
-                                sellingPlace: "Lieu de vente",
-                                sellingDate: "Date de vente",
-                                paymentStatus: "Statut du paiement",
-                                deliveryStatus: "État de la livraison",
-                                isReceived: "État de la réception",
-                                cdlpListingStatus: "Statut de l'annonce CD&LP",
-                                discogsSellingStatus: "Statut de l'annonce Discogs",
-                                ebayListingStatus: "Statut de l'annonce eBay",
-                                listingIssues: "Problèmes rencontrés",
-                            }[key] || key
-                        )}
+                        {fieldLabels[key] ?? key}
+                        {key?.includes("Price") || key?.includes("Fees") || key?.includes("Commission") ? (
+                            <Euro className="w-4 h-4 text-muted-foreground" />
+                        ) : null}
                     </Label>
 
                     {key === "support" ? (
@@ -133,19 +131,22 @@ export const VinyleFormFields = ({
                         </Select>
                     ) : key === "notes" || key === "listingIssues" ? (
                         <Textarea {...register(key)} />
-                    ) : key === "buyDate" || key === "sellingDate" ? (
-                        <DateTimePicker
-                            granularity={"day"}
-                            locale={fr}
-                            displayFormat={{ hour24: "PPP", hour12: "PP" }}
-                            value={watch(key) ? new Date(watch(key)) : undefined}
-                            onChange={(date) => {
-                                const formattedDate = date ? format(date, "yyyy-MM-dd", { locale: fr }) : ""
-                                setValue(key, formattedDate)
-                            }}
-                            className="cursor-pointer"
-                        />
-                    ) : (
+                    ) : key === "buyDate" || key === "sellingDate" ? (() => {
+                        const rawValue = watch(key);
+                        return (
+                            <DateTimePicker
+                                granularity="day"
+                                locale={fr}
+                                displayFormat={{ hour24: "PPP", hour12: "PP" }}
+                                value={rawValue && typeof rawValue === "string" && !isNaN(Date.parse(rawValue)) ? new Date(rawValue) : undefined}
+                                onChange={(date) => {
+                                    const formattedDate = date ? format(date, "yyyy-MM-dd", { locale: fr }) : "";
+                                    setValue(key, formattedDate);
+                                }}
+                                className="cursor-pointer"
+                            />
+                        );
+                    })() : (
                         <Input
                             type="text"
                             inputMode={

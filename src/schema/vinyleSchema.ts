@@ -37,7 +37,8 @@ export const vinyleSchema = z.object({
         invalid_type_error: "Statut de vente requis ou invalide"
     }).min(1, "Champ requis"),
     diskCondition: z.string().min(1, "Champ requis"),
-
+    // Margin, not in the form (calculated by back end)
+    margin: z.number().optional(),
     // Champs optionnels
     label: z.string().nullable().optional(),
     genre: z.string().nullable().optional(),

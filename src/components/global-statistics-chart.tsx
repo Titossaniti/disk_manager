@@ -143,11 +143,12 @@ export default function GlobalStatisticsChart() {
             const byYear = filtered.reduce<Record<number, MonthlyStat>>((acc, stat) => {
                 const { year, sold, revenue, margin } = stat
                 if (!acc[year]) {
-                    acc[year] = { year, month: 1, sold: 0, revenue: 0, margin: 0, label: String(year) }
+                    acc[year] = { year, month: 1, sold: 0, revenue: 0, margin: 0, otherBuyExpenses: 0, label: String(year) }
                 }
                 acc[year].sold += sold
                 acc[year].revenue += revenue
                 acc[year].margin += margin
+                acc[year].otherBuyExpenses += stat.otherBuyExpenses
                 return acc
             }, {})
             setDisplayedStats(Object.values(byYear))

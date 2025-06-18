@@ -133,7 +133,7 @@ export function OtherExpensesTable({
                                         </TableCell>
                                         <TableCell className="capitalize">
                                             {editMode ? (
-                                                <Input defaultValue={updated.category ?? e.category} onChange={(ev) => onUpdateRow(e.id, { category: ev.target.value })} />
+                                                <Input defaultValue={updated.category ?? e.category ?? ""} onChange={(ev) => onUpdateRow(e.id, { category: ev.target.value })} />
                                             ) : e.category}
                                         </TableCell>
                                         {editMode && (

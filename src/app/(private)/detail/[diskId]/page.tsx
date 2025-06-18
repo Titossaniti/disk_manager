@@ -3,7 +3,7 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import {Resolver, useForm} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { toast } from "sonner";
@@ -66,8 +66,9 @@ export default function DetailPage() {
     const [activeTab, setActiveTab] = useState("achat");
 
     const form = useForm<VinyleFormData>({
-        resolver: zodResolver(vinyleSchema),
+        resolver: zodResolver(vinyleSchema) as Resolver<VinyleFormData>,
     });
+
     const { handleSubmit, setValue, watch, formState: { isSubmitting, dirtyFields }, reset } = form;
 
     const { data: filtersInit, isLoading: isLoadingFilters } = useQuery({
@@ -83,8 +84,20 @@ export default function DetailPage() {
         queryFn: async () => {
             const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/vinyles/${diskId}`, { withCredentials: true });
             Object.entries(data).forEach(([key, value]) => {
-                setValue(key as keyof VinyleFormData, value);
+                if (
+                    key === "sellingStatus" &&
+                    typeof value === "object" &&
+                    value !== null &&
+                    "id" in value &&
+                    typeof (value as any).id === "number"
+                ) {
+                    setValue("sellingStatusId", (value as any).id);
+                }
+                else if (key in form.getValues()) {
+                    setValue(key as keyof VinyleFormData, value as VinyleFormData[keyof VinyleFormData]);
+                }
             });
+
             return data;
         },
     });
@@ -143,6 +156,7 @@ export default function DetailPage() {
         updateVinyle.mutate(data);
     };
 
+
     if (isLoading || isLoadingFilters || !filtersInit) {
         return (
             <div className="p-4 space-y-4">
@@ -154,7 +168,6 @@ export default function DetailPage() {
     }
 
     if (isError || !data) return <div className="p-4 text-red-600">Erreur de chargement. Il se peut que le disque recherché n'existe pas.</div>;
-
 
     return (
         <div className="p-4 md:p-6 space-y-6">
@@ -245,9 +258,7 @@ export default function DetailPage() {
                     <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {isEditing ? (
                             <VinyleFormFields
-                                form={form}
                                 filtersInit={filtersInit}
-                                isEditing={isEditing}
                                 register={form.register}
                                 errors={form.formState.errors}
                                 watch={form.watch}
@@ -283,9 +294,18 @@ export default function DetailPage() {
                                 <div className="flex flex-col border-b pb-2">
                                     <span className="text-sm font-medium text-muted-foreground">Statut</span>
                                     <span className="mt-1">
-                                        <Badge className={sellingStatusBadgeColor(data.sellingStatus?.label)}>
-                                            {data.sellingStatus?.label || "?"}
-                                        </Badge>
+                                        {(() => {
+                                            type SellingStatus = { id: number; label: string };
+
+                                            const sellingStatuses: SellingStatus[] = filtersInit.sellingStatuses;
+
+                                            const statusLabel = sellingStatuses.find(s => s.id === watch("sellingStatusId"))?.label;
+                                            return (
+                                                <Badge className={sellingStatusBadgeColor(statusLabel || "?")}>
+                                                    {statusLabel || "?"}
+                                                </Badge>
+                                            );
+                                        })()}
                                     </span>
                                 </div>
 

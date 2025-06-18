@@ -30,6 +30,9 @@ import { useTableFiltersValues } from "@/hooks/table-filters-values";
 import { CircleCheckBig, CircleSlash, Euro } from "lucide-react";
 import EditableDateCell from "@/components/editable-date-cell";
 import {Separator} from "@/components/ui";
+import {parseFiltersFromURL} from "@/lib/parseFilters";
+import {Filters} from "@/types/filters";
+
 
 const fetchVinyles = async (params: any) => {
     const queryParams = new URLSearchParams();
@@ -70,7 +73,7 @@ const fetchVinyles = async (params: any) => {
     return response.data;
 };
 
-const defaultFilters = {
+const defaultFilters: Filters = {
     artist: "",
     matchExactArtist: false,
     title: "",
@@ -108,25 +111,13 @@ const LiteVinylesTable = () => {
 
     const { data: sellingStatusOptions } = useSellingStatuses();
     const { data: filtersInit } = useTableFiltersValues();
-    const [filters, setFilters] = useState(defaultFilters);
+    const [filters, setFilters] = useState<Filters>(defaultFilters);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
-        const newFilters = { ...defaultFilters };
-
-        for (const [key, value] of params.entries()) {
-            if (key in defaultFilters) {
-                if (value === "true") newFilters[key] = true;
-                else if (value === "false") newFilters[key] = false;
-                else if (!isNaN(Number(value)) && key.endsWith("Min") || key.endsWith("Max")) newFilters[key] = Number(value);
-                else newFilters[key] = value;
-            } else if (key === "sellingStatuses") {
-                newFilters["sellingStatus"] = params.getAll("sellingStatuses");
-            }
-        }
-
-        setFilters(newFilters);
-        setAppliedFilters(newFilters);
+        const parsed = parseFiltersFromURL(params);
+        setFilters(parsed);
+        setAppliedFilters(parsed);
     }, []);
 
     const [appliedFilters, setAppliedFilters] = useState({ ...defaultFilters });
@@ -138,9 +129,9 @@ const LiteVinylesTable = () => {
     const { data, isLoading, isError, isFetching } = useQuery({
         queryKey: ["vinyles", { ...appliedFilters, page, size, sortBy, sortDirection }],
         queryFn: () => fetchVinyles({ ...appliedFilters, page, size, sortBy, sortDirection }),
-        keepPreviousData: true,
-
+        placeholderData: (prev) => prev,
     });
+
 
     const toggleEditMode = () => {
         const newMode = !editableMode;
