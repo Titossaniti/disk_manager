@@ -28,11 +28,44 @@ export default function AddVinyleForm() {
     const discogsRef = useRef<{ resetSearch: () => void }>(null);
     const queryClient = useQueryClient();
 
+    const defaultValues: VinyleFormData = {
+        artist: "",
+        title: "",
+        support: "",
+        genre: "",
+        label: "",
+        countryYear: "",
+        ref: "",
+        diskCondition: "",
+        scanStatus: "",
+        notes: "",
+        buyDate: "",
+        buyPlace: "",
+        netBuyPrice: 0,
+        buyDeliveryFees: 0,
+        sellingStatusId: 2,
+        sellingPlace: "",
+        sellingDate: "",
+        netSellingPrice: 0,
+        sellingDeliveryFees: 0,
+        sellingCommission: 0,
+        paypalFees: 0,
+        iebayFees: 0,
+        paymentStatus: "",
+        deliveryStatus: "",
+        isReceived: "",
+        cdlpListingPrice: 0,
+        cdlpListingStatus: "",
+        discogsSellingPrice: 0,
+        discogsSellingStatus: "",
+        ebayListingStatus: "",
+        listingIssues: "",
+    };
+
+
     const form = useForm<VinyleFormData>({
         resolver: zodResolver(vinyleSchema),
-        defaultValues: Object.fromEntries(
-            orderedFields.map((field) => [field, ""])
-        ) as any,
+        defaultValues
     });
 
     const {
