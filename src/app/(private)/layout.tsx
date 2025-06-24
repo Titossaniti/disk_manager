@@ -1,15 +1,22 @@
-import type { ReactNode } from "react";
-import { getSession } from "@/actions/auth";
-import { redirect } from "next/navigation";
+
 import ClientWrapper from "@/components/layout/client-wrapper";
+import {useAuth} from "@/hooks/useAuth";
+import {useRouter} from "next/navigation";
+import {useEffect} from "react";
 
-export const dynamic = "force-dynamic";
 
-export default async function PrivateLayout({ children }: { children: ReactNode }) {
-    const session = await getSession();
+export default function PrivateLayout({ children }: { children: React.ReactNode }) {
+    const { user, isLoading } = useAuth()
+    const router = useRouter()
 
-    if (!session) {
-        redirect("/login");
+    useEffect(() => {
+        if (!isLoading && !user) {
+            router.push("/login")
+        }
+    }, [user, isLoading, router])
+
+    if (isLoading || !user) {
+        return null
     }
 
     return <ClientWrapper>{children}</ClientWrapper>;
