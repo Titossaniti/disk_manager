@@ -1,12 +1,22 @@
-import { getSession } from "@/actions/auth"
-import { redirect } from "next/navigation"
+"use client"
 
-export default async function Home() {
-    const session = await getSession()
+import { useAuth } from "@/hooks/useAuth"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
-    if (session) {
-        redirect("/home")
-    } else {
-        redirect("/login")
-    }
+export default function Home() {
+    const { user, isLoading } = useAuth()
+    const router = useRouter()
+
+    useEffect(() => {
+        if (!isLoading) {
+            if (user) {
+                router.push("/home")
+            } else {
+                router.push("/login")
+            }
+        }
+    }, [user, isLoading, router])
+
+    return null
 }

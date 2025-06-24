@@ -1,17 +1,24 @@
-import {Disc3} from "lucide-react"
-import { redirect } from "next/navigation"
+"use client"
+
+import { Disc3 } from "lucide-react"
+import { useAuth } from "@/hooks/useAuth"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import { LoginForm } from "@/components/login-form"
-import { getSession } from "@/actions/auth"
-import {Button} from "@/components/ui";
-import Link from "next/link";
+import { Button } from "@/components/ui"
+import Link from "next/link"
 
-export default async function LoginPage() {
+export default function LoginPage() {
+    const { user, isLoading } = useAuth()
+    const router = useRouter()
 
-    const session = await getSession()
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.push("/home")
+        }
+    }, [user, isLoading, router])
 
-    if (session) {
-        redirect("/home")
-    }
+    if (isLoading || user) return null
 
     return (
         <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
