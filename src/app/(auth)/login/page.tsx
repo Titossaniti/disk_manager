@@ -13,7 +13,6 @@ export default function LoginPage() {
     const router = useRouter()
 
     useEffect(() => {
-        console.log("[/login] user =", user, "isLoading =", isLoading)
         if (!isLoading && user) {
             router.push("/home")
         }
