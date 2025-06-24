@@ -47,7 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         }
 
-        // fetchUser() est appelé uniquement si l'utilisateur n'est pas sur la page de login
         if (!pathname.startsWith("/login")) {
             fetchUser()
         } else {
@@ -73,8 +72,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 }
             }
 
-            const data = await response.json()
-            setUser(data.user ?? { id: "1", email, name: email.split("@")[0], role: "USER" })
+            const meResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+                credentials: "include",
+            })
+
+            if (!meResponse.ok) {
+                return {
+                    success: false,
+                    error: "Échec récupération de l'utilisateur",
+                }
+            }
+
+            const user = await meResponse.json()
+            setUser(user)
 
             router.push("/home")
             return { success: true }
