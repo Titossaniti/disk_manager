@@ -46,12 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setIsLoading(false)
             }
         }
-
-        if (!pathname.startsWith("/login")) {
-            fetchUser()
-        } else {
-            setIsLoading(false)
-        }
+        fetchUser()
     }, [pathname])
 
     const login = async (email: string, password: string) => {
