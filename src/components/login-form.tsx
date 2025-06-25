@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from "@/hooks/useAuth"
 import Link from "next/link";
+import {toast} from "sonner";
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
     const { login, isLoading } = useAuth()
@@ -28,10 +29,12 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             if (!result.success) {
                 setError(result.error || "Invalid email or password")
+                toast.error("Identifiant ou mot de passe invalide")
             }
 
         } catch (error) {
             setError("An unexpected error occurred. Please try again later.")
+            toast.error("Une erreur inattendue est survenue, merci de réessayer plus tard.")
         }
     }
 
