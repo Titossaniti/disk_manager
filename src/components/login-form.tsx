@@ -29,7 +29,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 
             if (!result.success) {
                 setError(result.error || "Invalid email or password")
-                toast.error("Identifiant ou mot de passe invalide")
+                toast.error(result.error || "Identifiant ou mot de passe invalide")
             }
 
         } catch (error) {
