@@ -46,7 +46,7 @@ export const VinyleFiltersForm = ({
             className="space-y-6 rounded-lg shadow p-4 bg-muted"
         >
 
-            {/* Ligne 1 : artiste - titre - pressage */}
+            {/* Ligne 1 : artiste - titre - pressage & support */}
             <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 {/* Artiste */}
                 <div className="space-y-1">
@@ -76,10 +76,37 @@ export const VinyleFiltersForm = ({
                     </div>
                 </div>
 
-                {/* Pressage */}
+                {/* Pressage + Support côte à côte */}
                 <div className="space-y-1">
-                    <Label htmlFor="countryYear">Pressage</Label>
-                    <Input id="countryYear" value={filters.countryYear} onChange={(e) => onChange("countryYear", e.target.value)} />
+                    <div className="flex gap-2">
+                        <div className="w-2/3">
+                            <Label htmlFor="countryYear">Pressage</Label>
+                        </div>
+                        <div className="w-1/3">
+                            <Label htmlFor="support">Support</Label>
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <Input
+                            id="countryYear"
+                            value={filters.countryYear}
+                            onChange={(e) => onChange("countryYear", e.target.value)}
+                            className="w-2/3"
+                        />
+                        <select
+                            id="support"
+                            value={filters.support ?? ""}
+                            onChange={(e) => onChange("support", e.target.value)}
+                            className="w-1/3 h-[36px] rounded border px-2 bg-white dark:bg-background text-sm"
+                        >
+                            <option value="">Tous</option>
+                            {filtersInit.supports?.map((support: string) => (
+                                <option key={support} value={support}>
+                                    {support}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
 
