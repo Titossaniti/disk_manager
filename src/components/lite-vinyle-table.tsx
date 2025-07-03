@@ -79,7 +79,7 @@ const defaultFilters: Filters = {
     title: "",
     matchExactTitle: false,
     countryYear: "",
-    support: "",
+    support: [],
     diskCondition: "",
     sellingStatus: [],
     buyPlace: "",

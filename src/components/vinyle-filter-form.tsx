@@ -102,7 +102,7 @@ export const VinyleFiltersForm = ({
                         />
                         <MultipleSelector
                             options={supportOptions}
-                            value={filters.support.map((v: string) => ({ label: v, value: v }))}
+                            value={Array.isArray(filters.support) ? filters.support.map((v: string) => ({ label: v, value: v })) : []}
                             onChange={(values) => onChange("support", values.map(v => v.value))}
                             placeholder={filters.support.length === 0 ? "Tous" : ""}
                             hidePlaceholderWhenSelected
