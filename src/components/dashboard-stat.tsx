@@ -119,7 +119,7 @@ export default function DashboardStat() {
                     {showNumbers ? "Masquer les chiffres" : "Afficher les chiffres"}
                 </Button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                 <Card className="flex flex-col justify-between">
                     <CardHeader>
                         <CardTitle>Statistiques détaillées</CardTitle>
@@ -129,7 +129,7 @@ export default function DashboardStat() {
                         <Link href="/statistics">
                             <Button variant="default" className="w-full cursor-pointer">
                                 <ChartColumn className="mr-2 h-5 w-5" />
-                                Accéder aux statistiques
+                                Voir
                             </Button>
                         </Link>
                     </CardContent>
