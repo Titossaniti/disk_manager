@@ -32,6 +32,13 @@ export const VinyleFiltersForm = ({
 }) => {
 
     const sellingStatuses = (filtersInit.sellingStatuses ?? []).filter(Boolean);
+    const supportOptions = (filtersInit.supports ?? [])
+        .filter(Boolean)
+        .map((support: string) => ({
+            key: support,
+            label: support,
+            value: support,
+        }));
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter") {
@@ -93,19 +100,14 @@ export const VinyleFiltersForm = ({
                             onChange={(e) => onChange("countryYear", e.target.value)}
                             className="w-2/3"
                         />
-                        <select
-                            id="support"
-                            value={filters.support ?? ""}
-                            onChange={(e) => onChange("support", e.target.value)}
-                            className="w-1/3 h-[36px] rounded border px-2 bg-white dark:bg-background text-sm"
-                        >
-                            <option value="">Tous</option>
-                            {filtersInit.supports?.map((support: string) => (
-                                <option key={support} value={support}>
-                                    {support}
-                                </option>
-                            ))}
-                        </select>
+                        <MultipleSelector
+                            options={supportOptions}
+                            value={filters.support.map((v: string) => ({ label: v, value: v }))}
+                            onChange={(values) => onChange("support", values.map(v => v.value))}
+                            placeholder={filters.support.length === 0 ? "Tous" : ""}
+                            hidePlaceholderWhenSelected
+                            className="w-1/3 bg-white/80 dark:bg-input/70 hover:bg-input hover:cursor-pointer h-[36px]"
+                        />
                     </div>
                 </div>
             </div>
