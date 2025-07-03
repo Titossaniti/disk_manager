@@ -7,7 +7,7 @@ export function parseFiltersFromURL(params: URLSearchParams): Filters {
         title: "",
         matchExactTitle: false,
         countryYear: "",
-        support: "",
+        support: [],
         diskCondition: "",
         sellingStatus: [],
         buyPlace: "",
@@ -30,7 +30,9 @@ export function parseFiltersFromURL(params: URLSearchParams): Filters {
             case "artist":
             case "title":
             case "countryYear":
-            case "support":
+            case "supports":
+                filters.support.push(value);
+                break;
             case "diskCondition":
             case "buyPlace":
             case "sellingPlace":

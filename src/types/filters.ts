@@ -4,7 +4,7 @@ export type Filters = {
     title: string;
     matchExactTitle: boolean;
     countryYear: string;
-    support: string;
+    support: string[];
     diskCondition: string;
     sellingStatus: string[];
     buyPlace: string;

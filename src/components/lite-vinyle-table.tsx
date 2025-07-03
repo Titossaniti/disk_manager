@@ -46,7 +46,11 @@ const fetchVinyles = async (params: any) => {
     if (params.title) queryParams.append("title", params.title);
     if (params.matchExactTitle) queryParams.append("matchExactTitle", "true");
     if (params.countryYear) queryParams.append("countryYear", params.countryYear);
-    if (params.support) queryParams.append("support", params.support);
+    if (params.support?.length) {
+        for (const value of params.support) {
+            queryParams.append("supports", value);
+        }
+    }
     if (params.diskCondition) queryParams.append("diskCondition", params.diskCondition);
     if (params.sellingStatus?.length) {
         for (const status of params.sellingStatus) {
